@@ -45,8 +45,10 @@ def compress_public_key(public_key:str) -> str:
 #wif_key = "5KMjtT3FcbCkdcbNYDMaTT8hGRbTwpj2fFHirSkqazvw4QSWsgk"
 
 Entropy = create_private_key()
+print("Private Key: %s"%Entropy)
+
 wif = create_wif(Entropy)
-print("Private Key: %s"% wif)
+print("WIF Key: %s"% wif)
 
 pubkey = wif_to_public_key(wif)
 print("Raw Public Key: %s"%pubkey)

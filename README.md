@@ -1,5 +1,7 @@
-# ECDSA-key
+# การสร้าง Private Key, Public key
+
+การ
 
 
-อ้างอิงซ
-# https://learnmeabitcoin.com/technical/wif
+อ้างอิง:
+https://learnmeabitcoin.com/technical/wif

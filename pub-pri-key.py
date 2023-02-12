@@ -51,7 +51,7 @@ wif = create_wif(Entropy)
 print("WIF Key: %s"% wif)
 
 pubkey = wif_to_public_key(wif)
-print("Raw Public Key: %s"%pubkey)
+print("Original Public Key: %s"%pubkey)
 
 public_key = compress_public_key(pubkey)
 print("Compress Public Key: %s"%public_key)

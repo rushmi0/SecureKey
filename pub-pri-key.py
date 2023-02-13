@@ -31,7 +31,6 @@ def random_entropy():
 
 def wif_to_public_key(wif_key:str) -> str:
     private_key = base58.b58decode(wif_key)[1:-4]
-    #print(private_key.hex())
     signing_key = ecdsa.SigningKey.from_string(private_key, curve=ecdsa.SECP256k1)
     verifying_key = signing_key.get_verifying_key()
     return '04' + verifying_key.to_string().hex()

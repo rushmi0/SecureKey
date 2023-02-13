@@ -3,6 +3,7 @@ import base58
 import ecdsa
 import os
 
+
 def create_wif(private_key_hex:str) -> str:
     private_key_bytes = bytes.fromhex(private_key_hex)
     prefix = b'\x80'

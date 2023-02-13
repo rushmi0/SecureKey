@@ -1,5 +1,5 @@
-import base58
 import hashlib
+import base58
 import ecdsa
 import os
 

@@ -1,5 +1,5 @@
-import hashlib
 import base58
+import hashlib
 import ecdsa
 import os
 
@@ -52,20 +52,19 @@ def compress_public_key(public_key:str) -> str:
         public_key = '03' + format(x, '064x')
     return public_key
 
-#wif_key = "5KMjtT3FcbCkdcbNYDMaTT8hGRbTwpj2fFHirSkqazvw4QSWsgk"
-# Kxk41rjJpX7LxSRe8aRxgdSicmSJDG7JmLDynK9wYg8XBzvCkcQz
 
-Entropy = random_entropy()
-print("Private Key: %s length\n> %s\n" % (len(Entropy), Entropy))
+def main():
+    Entropy = random_entropy()
+    print("Private Key: %s length\n> %s\n" % (len(Entropy), Entropy))
+    wif = create_wif(Entropy)
+    print("WIF Key: %s lengthn\n> %s\n"% (len(wif), wif))
+    wif_compress = create_wif_compressed(Entropy)
+    print("WIF Key Compress: %s length\n> %s\n"% (len(wif_compress), wif_compress))
+    pubkey = wif_to_public_key(wif)
+    print("Original Public Key: %s length\n> %s\n"%(len(pubkey), pubkey))
+    public_key = compress_public_key(pubkey)
+    print("Compress Public Key: %s length\n> %s"% (len(public_key), public_key))
 
-wif = create_wif(Entropy)
-print("WIF Key: %s lengthn\n> %s\n"% (len(wif), wif))
 
-wif_compress = create_wif_compressed(Entropy)
-print("WIF Key Compress: %s length\n> %s\n"% (len(wif_compress), wif_compress))
-
-pubkey = wif_to_public_key(wif)
-print("Original Public Key: %s length\n> %s\n"%(len(pubkey), pubkey))
-
-public_key = compress_public_key(pubkey)
-print("Compress Public Key: %s length\n> %s"% (len(public_key), public_key))
+if __name__ == "__main__":
+    main()

@@ -16,10 +16,10 @@ def create_wif(private_key_hex:str) -> str:
 def create_wif_compressed(private_key_hex:str) -> str:
     private_key_bytes = bytes.fromhex(private_key_hex)
     prefix = b'\x80'
-    Compressed = b'\x01'
+    compressed = b'\x01'
     extended_key = prefix + private_key_bytes
     checksum = hashlib.sha256(hashlib.sha256(extended_key).digest()).digest()[:4]
-    wif = base58.b58encode(extended_key + Compressed + checksum)
+    wif = base58.b58encode(extended_key + compressed + checksum)
     return wif.decode('utf-8')
 
 

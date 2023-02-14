@@ -25,7 +25,6 @@ def create_wif_compressed(private_key_hex:str) -> str:
 
 def random_entropy():
     for i in range(75000):
-    #for i in range(7):
         entropy = os.urandom(32)
         entropy = int.from_bytes(entropy, byteorder='big')
         private_key = hashlib.sha256(str(entropy).encode()).hexdigest()

@@ -1,10 +1,12 @@
-import base58
 import hashlib
+import base58
 import ecdsa
 import os
 
 
 def create_wif(private_key_hex:str) -> str:
+    """ รับ Private Key เข้ามาแล้วส่ง WIF Key ออกไป """
+    
     private_key_bytes = bytes.fromhex(private_key_hex)
     prefix = b'\x80'
     extended_key = prefix + private_key_bytes
@@ -23,7 +25,7 @@ def create_wif_compressed(private_key_hex:str) -> str:
     return wif.decode('utf-8')
 
 
-def random_entropy():
+def private_key():
     for i in range(75000):
         entropy = os.urandom(32)
         entropy = int.from_bytes(entropy, byteorder='big')
@@ -57,7 +59,7 @@ def compress_public_key(public_key:str) -> str:
 
 
 def main():
-    Entropy = random_entropy()
+    Entropy = private_key()
     print("Private Key: %s length\n> %s\n" % (len(Entropy), Entropy))
     wif = create_wif(Entropy)
     print("WIF Key: %s lengthn\n> %s\n"% (len(wif), wif))

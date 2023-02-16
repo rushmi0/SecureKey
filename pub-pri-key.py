@@ -3,10 +3,13 @@ import base58
 import ecdsa
 import os
 
+# Prefix -> Mainnet = 0x80, Testnet = 0xEF
 
-def create_wif(private_key_hex:str) -> str:
-    """ รับ Private Key เข้ามาแล้วส่ง WIF Key ออกไป """
-    
+def create_wif(private_key_hex: str) -> str:
+    """ Prefix + Private Key + Checksum """
+
+    # รับ Private Key เข้ามาแล้วส่ง WIF Key ออกไป
+
     private_key_bytes = bytes.fromhex(private_key_hex)
     prefix = b'\x80'
     extended_key = prefix + private_key_bytes
@@ -15,7 +18,9 @@ def create_wif(private_key_hex:str) -> str:
     return wif.decode('utf-8')
 
 
-def create_wif_compressed(private_key_hex:str) -> str:
+def create_wif_compressed(private_key_hex: str) -> str:
+    """ รับ Private Key เข้ามาแล้วส่ง WIF Key ออกไป """
+
     private_key_bytes = bytes.fromhex(private_key_hex)
     prefix = b'\x80'
     compressed = b'\x01'
@@ -35,14 +40,14 @@ def private_key():
     return private_key
 
 
-def wif_to_public_key(wif_key:str) -> str:
+def wif_to_public_key(wif_key: str) -> str:
     private_key = base58.b58decode(wif_key)[1:-4]
     signing_key = ecdsa.SigningKey.from_string(private_key, curve=ecdsa.SECP256k1)
     verifying_key = signing_key.get_verifying_key()
     return '04' + verifying_key.to_string().hex()
 
 
-def compress_public_key(public_key:str) -> str:
+def compress_public_key(public_key: str) -> str:
     if public_key[0:2] != '04':
         raise ValueError('Invalid Public Key')
     x = int(public_key[2:66], 16)

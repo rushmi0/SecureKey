@@ -42,7 +42,7 @@ def wif_to_public_key(wif_key:str) -> str:
 
 def compress_public_key(public_key:str) -> str:
     if public_key[0:2] != '04':
-        raise ValueError('Invalid public key')
+        raise ValueError('Invalid Public Key')
     x = int(public_key[2:66], 16)
     print("The coordinates of point X: %s length\n> %s\n" % (len(str(x)), x))
 

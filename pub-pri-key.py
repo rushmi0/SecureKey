@@ -1,8 +1,9 @@
 import hashlib
-import base58
-import ecdsa
+import base58 # https://pypi.org/project/base58/
+import ecdsa # https://pypi.org/project/ecdsa/
 import os
 
+# Prefix -> Mainnet = 0x80, Testnet = 0xEF
 
 def create_wif(private_key_hex: str) -> str:
     """ Prefix + Private Key + Checksum """
@@ -17,7 +18,7 @@ def create_wif(private_key_hex: str) -> str:
 
 def create_wif_compressed(private_key_hex: str) -> str:
     """ Prefix + Private Key + Compressed + Checksum """
-
+    
     private_key_bytes = bytes.fromhex(private_key_hex)
     prefix = b'\x80'
     compressed = b'\x01'
@@ -27,14 +28,22 @@ def create_wif_compressed(private_key_hex: str) -> str:
     return wif.decode('utf-8')
 
 
-def private_key():
-    for i in range(75000):
-        entropy = os.urandom(32)
-        entropy = int.from_bytes(entropy, byteorder='big')
-        private_key = hashlib.sha256(str(entropy).encode()).hexdigest()
-        print(" > index %s | %s " % (i+1, private_key))
-        print("────"*21)
-    return private_key
+def random():
+    byte_obj = os.urandom(32)
+    int_value = int.from_bytes(byte_obj, byteorder='big')
+    str_value = str(int_value).encode('utf-8')
+
+    """ 
+     สุ่มค่ามา 32 Bytes แล้วนำไป Hash ด้วย Sha256 8999999 ครั้ง 
+     เพื่อป้องกันไม่ให้ ฺBoost Force หา Private Key เจอง่าย ๆ เพราะต้องใชเวลาประมาณหนึ่ง
+    """
+
+    for i in range(8999999):
+        hash_object = hashlib.sha256(str_value)
+        PrivateKey = hash_object.hexdigest()
+        str_value = PrivateKey.encode('utf-8')
+
+    return  PrivateKey
 
 
 def wif_to_public_key(wif_key: str) -> str:
@@ -48,10 +57,10 @@ def compress_public_key(public_key: str) -> str:
     if public_key[0:2] != '04':
         raise ValueError('Invalid Public Key')
     x = int(public_key[2:66], 16)
-    print("The coordinates of point X: %s length\n> %s\n" % (len(str(x)), x))
+    #print("The coordinates of point X: %s length\n> %s\n" % (len(str(x)), x))
 
     y = int(public_key[66:], 16)
-    print("The coordinates of point Y: %s length\n> %s\n" % (len(str(y)), y))
+    #print("The coordinates of point Y: %s length\n> %s\n" % (len(str(y)), y))
 
     if (y % 2) == 0:
         public_key = '02' + format(x, '064x')
@@ -61,16 +70,22 @@ def compress_public_key(public_key: str) -> str:
 
 
 def main():
-    Entropy = private_key()
-    print("Private Key: %s length\n> %s\n" % (len(Entropy), Entropy))
+    Entropy = random()
+
     wif = create_wif(Entropy)
-    print("WIF Key: %s lengthn\n> %s\n"% (len(wif), wif))
+    print("WIF Key: %s lengthn\n> %s\n" % (len(wif), wif))
+
     wif_compress = create_wif_compressed(Entropy)
-    print("WIF Key Compress: %s length\n> %s\n"% (len(wif_compress), wif_compress))
+    print("WIF Key [Compress]: %s length\n> %s\n" % (len(wif_compress), wif_compress))
+
     pubkey = wif_to_public_key(wif)
-    print("Original Public Key: %s length\n> %s\n"%(len(pubkey), pubkey))
+    print("Original Public Key: %s length\n> %s\n" % (len(pubkey), pubkey))
+
+    private_key = base58.b58decode(wif_compress)[1:-4]
+    print("Private Key: %s length\n> %s\n" % (len(private_key), private_key.hex()))
+
     public_key = compress_public_key(pubkey)
-    print("Compress Public Key: %s length\n> %s"% (len(public_key), public_key))
+    print("Public Key [Compress]: %s length\n> %s" % (len(public_key), public_key))
 
 
 if __name__ == "__main__":

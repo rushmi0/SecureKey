@@ -5,7 +5,7 @@ WIF มาจากคำว่า Wallet Import Format เป็นรูปแ
 
 ## ส่วนประกอบและขั้นตอนการสร้าง WIF Key
 
-1. Byte Prefix เป็นตัวกำหนดว่า Private Key นี้ใช้สำหรับ Network อะไร
+1. Prefix (รูปลักษณ์ Byte) เป็นตัวกำหนดว่า Private Key นี้ใช้สำหรับ Network อะไร
 - Mainnet = 0x80
 - Testnet = 0xEF
 
@@ -18,4 +18,4 @@ WIF มาจากคำว่า Wallet Import Format เป็นรูปแ
 ```sh
 c51a52e294165cfde3342e8c12c5f3370d29d12401c03803fe34de78c80b1804
 ```
-3. Byte suffix เป็นตัวกำหนดว่า
+3. Suffix (รูปลักษณ์ Byte) เป็นตัวกำหนดว่า

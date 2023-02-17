@@ -6,8 +6,8 @@ WIF มาจากคำว่า Wallet Import Format เป็นรูปแ
 ## ส่วนประกอบของ WIF Key
 
 Prefix เป็นตัวกำหนดว่า Private Key นี้ใช้สำหรับ Network อะไร
-- Mainnet <- 0x80
-- Testnet <- 0xEF
+- Mainnet = 0x80
+- Testnet = 0xEF
 
 ## ขั้นตอนการสร้าง WIF Key
 

@@ -3,12 +3,9 @@ import base58
 import ecdsa
 import os
 
-# Prefix -> Mainnet = 0x80, Testnet = 0xEF
 
 def create_wif(private_key_hex: str) -> str:
     """ Prefix + Private Key + Checksum """
-
-    # รับ Private Key เข้ามาแล้วส่ง WIF Key ออกไป
 
     private_key_bytes = bytes.fromhex(private_key_hex)
     prefix = b'\x80'
@@ -19,7 +16,7 @@ def create_wif(private_key_hex: str) -> str:
 
 
 def create_wif_compressed(private_key_hex: str) -> str:
-    """ รับ Private Key เข้ามาแล้วส่ง WIF Key ออกไป """
+    """ Prefix + Private Key + Compressed + Checksum """
 
     private_key_bytes = bytes.fromhex(private_key_hex)
     prefix = b'\x80'

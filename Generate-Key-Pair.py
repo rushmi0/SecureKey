@@ -4,7 +4,7 @@ import ecdsa # https://pypi.org/project/ecdsa/
 import os
 
 ENTROPY_LENGTH = 64        # ปรับแก้จำนวน Bytes ตามต้องการ
-LOOP_TIME = 26000000       # 20วินาที
+LOOP_TIME = 52000000       # 20วินาที
 
 def create_wif(private_key_hex: str) -> str:
     """ Prefix + Private Key + Checksum """

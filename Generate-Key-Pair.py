@@ -28,8 +28,8 @@ def create_wif_compressed(private_key_hex: str) -> str:
 
 
 def random():
-    byte_obj = os.urandom(64)
-    int_value = int.from_bytes(byte_obj, byteorder='big')
+    byte_value = os.urandom(64)
+    int_value = int.from_bytes(byte_value, byteorder='big')
     str_value = str(int_value).encode('utf-8')
 
     '''
@@ -40,10 +40,11 @@ def random():
     ค่า Hash สุดท้ายจะถูกส่งออกเป็น สตริงเลขฐาน16
     
     '''
+    
     for i in range(13000000):
-        hash_object = hashlib.sha256(str_value)
-        PrivateKey = hash_object.hexdigest()
-        str_value = PrivateKey.encode('utf-8')
+        hash_obj = hashlib.sha256(str_value)
+        hash_result = hash_obj.hexdigest()
+        str_value = hash_result.encode('utf-8')
 
     return  PrivateKey
 

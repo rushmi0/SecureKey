@@ -3,6 +3,7 @@ import base58 # https://pypi.org/project/base58/
 import ecdsa # https://pypi.org/project/ecdsa/
 import os
 
+
 ENTROPY_LENGTH = 64        # ปรับแก้จำนวน Bytes ตามต้องการ
 LOOP_TIME = 62000000       # 20วินาที
 

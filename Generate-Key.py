@@ -32,10 +32,10 @@ def random():
     int_value = int.from_bytes(byte_obj, byteorder='big')
     str_value = str(int_value).encode('utf-8')
 
-    """ 
-     สุ่มค่ามา 32 Bytes แล้วนำไป Hash ด้วย Sha256 8999999 ครั้ง 
-     เพื่อป้องกันไม่ให้ ฺBoost Force หา Private Key เจอง่าย ๆ เพราะต้องใชเวลาประมาณหนึ่ง
-    """
+    
+   # สุ่มค่ามา 32 Bytes แล้วนำไป Hash ด้วย Sha256 8999999 ครั้ง 
+   # เพื่อป้องกันไม่ให้ ฺBoost Force หา Private Key เจอง่าย ๆ เพราะต้องใชเวลาประมาณหนึ่ง
+    
 
     for i in range(8999999):
         hash_object = hashlib.sha256(str_value)

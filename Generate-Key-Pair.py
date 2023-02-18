@@ -3,6 +3,8 @@ import base58 # https://pypi.org/project/base58/
 import ecdsa # https://pypi.org/project/ecdsa/
 import os
 
+ENTROPY_LENGTH = 64        # ปรับแก้จำนวน Bytes ตามต้องการ
+LOOP_TIME = 26000000       # 20วินาที
 
 def create_wif(private_key_hex: str) -> str:
     """ Prefix + Private Key + Checksum """
@@ -28,23 +30,22 @@ def create_wif_compressed(private_key_hex: str) -> str:
 
 
 def random():
-    byte_value = os.urandom(64)
+    byte_value = os.urandom(ENTROPY_LENGTH)
     int_value = int.from_bytes(byte_value, byteorder='big')
-    str_value = str(int_value).encode('utf-8')
+    encoded_value = str(int_value).encode('utf-8')
 
     '''
-    ฟังก์ชัน random() สุ่มค่ามา 64 Bytes แปลงรูปลักษณ์เป็นเลขฐาน10 แล้วนำไป Hash ซ้ำๆ ด้วย Sha256 13000000 ครั้ง 
-    เพื่อป้องกันการ Boost Force หา Private Key เจอง่าย ๆ ต้องใช้เวลาประมาณ 10วินาที ทำให้ยากที่จะเดา ต่อให้มีพลังการคำนวน
+    ฟังก์ชัน random() สุ่มค่ามา 64 Bytes แปลงรูปลักษณ์เป็นเลขฐาน10 แล้วนำไป Hash ซ้ำๆ ด้วย Sha256 26000000 ครั้ง 
+    เพื่อป้องกันการ Boost Force หา Private Key เจอง่าย ๆ ต้องใช้เวลาประมาณ 20วินาที ทำให้ยากที่จะเดา ต่อให้มีพลังการคำนวน
     สูงมากๆ แต่ๆ ความเป็นไปได้ของ Sha256 Hash คือ 2^256 ซึ่งมันมากมายมหาศาล เทียบเท่าจำนวนอะตอมทั้งจักราวาลที่แสงเดินทางไปถึง 
     
-    ค่า Hash สุดท้ายจะถูกส่งออกเป็น สตริงเลขฐาน16
-    
+    ค่า Hash สุดท้ายจะถูกส่งออกเป็น สตริงรูปลักษณเลขฐาน16
     '''
 
-    for i in range(13000000):
-        hash_obj = hashlib.sha256(str_value)
+    for i in range(LOOP_TIME):
+        hash_obj = hashlib.sha256(encoded_value)
         hash_result = hash_obj.hexdigest()
-        str_value = hash_result.encode('utf-8')
+        encoded_value = hash_result.encode('utf-8')
 
     return  hash_result
 

@@ -28,12 +28,12 @@ def create_wif_compressed(private_key_hex: str) -> str:
 
 
 def random():
-    byte_obj = os.urandom(32)
+    byte_obj = os.urandom(64)
     int_value = int.from_bytes(byte_obj, byteorder='big')
     str_value = str(int_value).encode('utf-8')
 
     '''
-    ฟังก์ชัน random() สุ่มค่ามา 32 Bytes แปลงรูปลักษณ์เป็นเลขฐาน10 แล้วนำไป Hash ซ้ำๆ ด้วย Sha256 13000000 ครั้ง 
+    ฟังก์ชัน random() สุ่มค่ามา 64 Bytes แปลงรูปลักษณ์เป็นเลขฐาน10 แล้วนำไป Hash ซ้ำๆ ด้วย Sha256 13000000 ครั้ง 
     เพื่อป้องกันการ Boost Force หา Private Key เจอง่าย ๆ ต้องใช้เวลาประมาณ 10วินาที ทำให้ยากที่จะเดา ต่อให้มีพลังการคำนวน
     สูงมากๆ แต่ๆ ความเป็นไปได้ของ Sha256 มันมหาศาล
     

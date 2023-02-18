@@ -46,7 +46,7 @@ def random():
         hash_result = hash_obj.hexdigest()
         str_value = hash_result.encode('utf-8')
 
-    return  PrivateKey
+    return  hash_result
 
 
 def wif_to_public_key(wif_key: str) -> str:

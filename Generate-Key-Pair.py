@@ -4,7 +4,7 @@ import ecdsa # https://pypi.org/project/ecdsa/
 import os
 
 ENTROPY_LENGTH = 64        # ปรับแก้จำนวน Bytes ตามต้องการ
-LOOP_TIME = 52000000       # 20วินาที
+LOOP_TIME = 62000000       # 20วินาที
 
 def create_wif(private_key_hex: str) -> str:
     """ Prefix + Private Key + Checksum """
@@ -35,7 +35,7 @@ def random():
     encoded_value = str(int_value).encode('utf-8')
 
     '''
-    ฟังก์ชัน random() สุ่มค่ามา 64 Bytes แปลงรูปลักษณ์เป็นเลขฐาน10 แล้วนำไป Hash ซ้ำๆ ด้วย Sha256 26000000 ครั้ง 
+    ฟังก์ชัน random() สุ่มค่ามา 64 Bytes แปลงรูปลักษณ์เป็นเลขฐาน10 แล้วนำไป Hash ซ้ำๆ ด้วย Sha256 62000000 ครั้ง 
     เพื่อป้องกันการ Boost Force หา Private Key เจอง่าย ๆ ต้องใช้เวลาประมาณ 20วินาที ทำให้ยากที่จะเดา ต่อให้มีพลังการคำนวน
     สูงมากๆ แต่ๆ ความเป็นไปได้ของ Sha256 Hash คือ 2^256 ซึ่งมันมากมายมหาศาล เทียบเท่าจำนวนอะตอมทั้งจักราวาลที่แสงเดินทางไปถึง 
     

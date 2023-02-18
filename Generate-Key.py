@@ -3,7 +3,6 @@ import base58 # https://pypi.org/project/base58/
 import ecdsa # https://pypi.org/project/ecdsa/
 import os
 
-# Prefix -> Mainnet = 0x80, Testnet = 0xEF
 
 def create_wif(private_key_hex: str) -> str:
     """ Prefix + Private Key + Checksum """
@@ -11,13 +10,7 @@ def create_wif(private_key_hex: str) -> str:
     private_key_bytes = bytes.fromhex(private_key_hex)
     prefix = b'\x80'
     extended_key = prefix + private_key_bytes
-    #print(extended_key.hex())
-
-    #checksum = hashlib.sha256(hashlib.sha256(extended_key).digest()).digest()#[:4]
-    #print(checksum.hex())
-
     checksum = hashlib.sha256(hashlib.sha256(extended_key).digest()).digest()[:4]
-    #print(checksum.hex())
     wif = base58.b58encode(extended_key + checksum)
     return wif.decode('utf-8')
 
@@ -37,7 +30,6 @@ def create_wif_compressed(private_key_hex: str) -> str:
 def random():
     byte_obj = os.urandom(32)
     int_value = int.from_bytes(byte_obj, byteorder='big')
-    #print(int_value)
     str_value = str(int_value).encode('utf-8')
 
     """ 
@@ -45,12 +37,10 @@ def random():
      เพื่อป้องกันไม่ให้ ฺBoost Force หา Private Key เจอง่าย ๆ เพราะต้องใชเวลาประมาณหนึ่ง
     """
 
-    for i in range(1):
+    for i in range(8999999):
         hash_object = hashlib.sha256(str_value)
         PrivateKey = hash_object.hexdigest()
         str_value = PrivateKey.encode('utf-8')
-        #print(PrivateKey)
-
     return  PrivateKey
 
 

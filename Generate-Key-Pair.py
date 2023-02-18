@@ -32,9 +32,14 @@ def random():
     int_value = int.from_bytes(byte_obj, byteorder='big')
     str_value = str(int_value).encode('utf-8')
 
-    # สุ่มค่ามา 32 Bytes แล้วนำไป Hash ด้วย Sha256 13000000 ครั้ง 
-    # เพื่อป้องกันไม่ให้ ฺBoost Force หา Private Key เจอง่าย ๆ เพราะต้องใชเวลาประมาณหนึ่ง
-
+    '''
+    ฟังก์ชัน random() สุ่มค่ามา 32 Bytes แปลงรูปลักษณ์เป็นเลขฐาน10 แล้วนำไป Hash ซ้ำๆ ด้วย Sha256 13000000 ครั้ง 
+    เพื่อป้องกันการ Boost Force หา Private Key เจอง่าย ๆ ต้องใช้เวลาประมาณ 10วินาที ทำให้ยากที่จะเดา ต่อให้มีพลังการคำนวน
+    สูงมากๆ แต่ๆ ความเป็นไปได้ของ Sha256 มันมหาศาล
+    
+    ค่า Hash สุดท้ายจะถูกส่งออกเป็น สตริงเลขฐาน16
+    
+    '''
     for i in range(13000000):
         hash_object = hashlib.sha256(str_value)
         PrivateKey = hash_object.hexdigest()

@@ -6,7 +6,9 @@ import java.util.Random;
 
 
 public class WIF {
-
+  
+    public static String Private_to_WIF(String privateKeyHex) throws Exception {
+         
      /*
       *
       *  ฟังก์ชั่น Private_to_WIF_compressed
@@ -14,8 +16,7 @@ public class WIF {
       *          └──  ผลลัพธ์ WIF Key  ::  -> 5JwcVJQfQbzAfXnMYQXzLjzczGi22v8BvyyHkUBTmYwN7Z3Qswa
       *  
       */
-     
-    public static String Private_to_WIF(String privateKeyHex) throws Exception {
+         
         byte[] privateKeyBytes = hexStringToByteArray(privateKeyHex);
         byte[] prefix = new byte[] { (byte) 0x80 };
 
@@ -30,6 +31,10 @@ public class WIF {
     
     
 
+     
+    
+    public static String Private_to_WIF_compressed(String privateKeyHex) throws Exception {
+         
      /*
       *
       *  ฟังก์ชั่น Private_to_WIF_compressed
@@ -37,8 +42,7 @@ public class WIF {
       *          └──  ผลลัพธ์ WIF Key  ::  -> L2C3duqSXBRKf4sBfcsn68mKqnL3ZTUjFGTSvryB9dxxBche5CNY
       * 
       */
-    
-    public static String Private_to_WIF_compressed(String privateKeyHex) throws Exception {
+         
         byte[] privateKeyBytes = hexStringToByteArray(privateKeyHex);
         byte[] prefix = new byte[] { (byte) 0x80 };
         byte[] compressed = new byte[] { (byte) 0x01 };

@@ -100,7 +100,7 @@ public class WIF {
 
 
     public static String random_key() {
-        final int ENTROPY_LENGTH = 64;      // ปรับแก้จำนวน Bytes ตามต้องการ
+        final int ENTROPY_LENGTH = 64;           // ปรับแก้จำนวน Bytes ตามต้องการ
         final int LIMIT = 62000000;              // 12วินาที
 
         try {

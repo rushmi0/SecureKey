@@ -21,7 +21,7 @@
 ```sh
 c51a52e294165cfde3342e8c12c5f3370d29d12401c03803fe34de78c80b1804
 ```
-## 3. Compression
+## 3. Compression (optional)
 เป็นตัวกำหนดว่า Private Key นี้ใช้สำหรับสร้าง Public Key แบบบีบอัด ส่วนนี้เป็นตัวเลือกครับ จะใช้หรือไม่ใช้ก็ได้ ไม่บังคับ
 - **Compressed** = 0x01
 

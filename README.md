@@ -44,7 +44,7 @@ sudo cp -r ecdsa /usr/bin/python3.10
 c51a52e294165cfde3342e8c12c5f3370d29d12401c03803fe34de78c80b1804
 ```
 
-- **Bytes**
+- **ผลลัพธ์ SHA256 รูปลักษณ์ Bytes**
 ```angular2html
 b'\xc5\x1aR\xe2\x94\x16\\\xfd\xe34.\x8c\x12\xc5\xf37\r)\xd1$\x01\xc08\x03\xfe4\xdex\xc8\x0b\x18\x04'
 ```

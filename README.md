@@ -34,7 +34,7 @@ b'\xc5\x1aR\xe2\x94\x16\\\xfd\xe34.\x8c\x12\xc5\xf37\r)\xd1$\x01\xc08\x03\xfe4\x
 
 ตัวอย่างนี้ เป็นรูปลักษณ์ Bytes จากภาษา Python ใช้เป็นเลขฐาน16 ขั้นตัวเลขด้วย **\x**
 
-- **Prefix**
+- **Prefix** (Mainnet)
 ```angular2html
 b'\x80'
 ```
@@ -70,3 +70,5 @@ b'\x03\xb3\x11{'
 ```angular2html
 L3prRpKEBSTW2HCNXA699mXsMECUZPdP4GXJb4otEDe4SZc7ooEa
 ```
+
+![WIF Key](https://user-images.githubusercontent.com/120770468/223149932-08184d02-3b58-4d08-a3fb-a34b8ba5ba60.png)

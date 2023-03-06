@@ -101,7 +101,7 @@ public class WIF {
 
 
     public static String KeyGan() {
-        final int ENTROPY_LENGTH = 214748364;            // ปรับแก้จำนวนตามต้องการ
+        final int ENTROPY_LENGTH = 512;                  // ปรับแก้จำนวนตามต้องการ
         final int LIMIT = 137000000;                     // 36วินาที Intel I5 Gen10. OC เต็มกำลัง
 
         try {
@@ -142,10 +142,13 @@ public class WIF {
     }
 
 
+    // Test
     public static void main(String[] args) {
+        
         try {
             String privateKeyHex = KeyGan();
             String private_key = privateKeyHex;
+            
             //String private_key = "9454a5235cf34e382d7e927eb5709dc4f4ed08eed177cb3f2d4ea359071962d7";
             System.out.println("Pritvate Key: "+ private_key.length() +" length\n\t└── " + private_key +"\n");
             String wif = WIF.Private_to_WIF(private_key);
@@ -157,11 +160,14 @@ public class WIF {
 
             byte[] decoded = Base58.decode(wif);
             //System.out.println(Arrays.toString(decoded));
+            
             byte[] Original_Key = Arrays.copyOfRange(decoded, 1, 33);
 
             String hexString = byteArray_To_HexString(Original_Key);
             System.out.println(new String("Original Key: "+ hexString.length() +" length\n\t└── " + hexString));
-        } catch (Exception e) {
+        } 
+        
+        catch (Exception e) {
             System.out.println("An error occurred while generating the WIF key: " + e.getMessage());
         }
 

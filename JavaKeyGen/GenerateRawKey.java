@@ -29,7 +29,6 @@ public class GenerateRawKey {
             for (byte b : hash) {
                sb.append(String.format("%02x", b));
             }
-            System.out.println(sb.toString());
             return sb.toString();
 
         }
@@ -45,8 +44,9 @@ public class GenerateRawKey {
         }
     }
 
+    // Test
     public static void main(String[] args) {
         String hashResult = KeyGan();
-        System.out.println(hashResult);
+        System.out.println("Private Key: " + hashResult);
     }
 }

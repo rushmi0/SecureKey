@@ -26,5 +26,41 @@ c51a52e294165cfde3342e8c12c5f3370d29d12401c03803fe34de78c80b1804
 ## 4. Checksum
 นำค่า **Prefix + Private Key** มาต่อกัน **(เน้นย้ำว่าทำใน รูปลักษณ์ Bytes)** จากนั้นนำไปเข้า SHA256 Hash. นำผลลัพธ์ที่ได้ตัดเอาเฉพาะ 4 Bytes แรกมันคือค่า Checksum
 
+ตัวอย่างนี้ เป็นรูปลักษณ์ Bytes จากภาษา Python ใช้เป็นเลขฐาน16 ขั้นตัวเลขด้วย **\x**
+
+- **Prefix**
+```angular2html
+b'\x80'
+```
+
+- **Private Key**
+```angular2html
+b'\xc5\x1aR\xe2\x94\x16\\\xfd\xe34.\x8c\x12\xc5\xf37\r)\xd1$\x01\xc08\x03\xfe4\xdex\xc8\x0b\x18\x04'
+```
+
+- **Prefix + Private Key**
+```angular2html
+b'\x80\xc5\x1aR\xe2\x94\x16\\\xfd\xe34.\x8c\x12\xc5\xf37\r)\xd1$\x01\xc08\x03\xfe4\xdex\xc8\x0b\x18\x04'
+```
+
+- **[Prefix + Private Key]** ⟶ **[SHA256]**
+```angular2html
+b'\x03\xb3\x11{\xaa+Qa\x8e\x14\x98\xab\xfd\x98\xdd\xc4\x92n\xaa\xaa\x8d\x8d\x01\nH1\xa1<\xe3\xdb\x1e\xbd'
+```
+
+- **[SHA256]** ⟶ **[First 4 Bytes]** ⟶ **Checksum**
+```angular2html
+b'\x03\xb3\x11{'
+```
+
 ## 5. Base58 Encode
 สุดท้ายนี้นำค่าทั้งหมดมาต่อกันตามลำดับ **(รูปลักษณ์ Bytes)** แล้วเข้ารหัสด้วย Base58. การเข้ารหัสนี้ไม่ได้ทำเพื่อความปลอดภัย เพียงแต่ทำให้มันดูง่าย ลดความผิดพลาดต่าง ๆ
+
+- **Base58**(**Prefix** + **Private Key** + **Checksum**)
+```angular2html
+5KK6JrgvjhCttVbJ7NzohxQJkYzRpff9d5spV7JRJ3QoYd1A2pA
+```
+- **Base58**(**Prefix** + **Private Key** + **Compressed** + **Checksum**)
+```angular2html
+L3prRpKEBSTW2HCNXA699mXsMECUZPdP4GXJb4otEDe4SZc7ooEa
+```

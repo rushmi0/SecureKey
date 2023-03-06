@@ -6,6 +6,30 @@
 ## ขั้นตอนการสร้าง WIF Key
 ทั้งหมดนี้ทำในรูปลักษณ์ Bytes
 
+
+## ติดตั้ง Module สำหรับ Python
+```sh
+pip install base58
+pip install ecdsa
+```
+
+```angular2html
+python3
+
+import base58
+import ecdsa
+exit()
+```
+
+## ถ้าทำตามด้านบนแล้วยังใช้ไม่ได้
+โหลด File นั้นมาเลย แล้วแตก File จากนั้นเข้าไปข้างใน เราจะคัดลอก Module ไปที่ python3.10 library root
+- สำหรับ **Ubuntu, Debian** 
+```angular2html
+sudo cp -r base58 /usr/bin/python3.10
+sudo cp -r ecdsa /usr/bin/python3.10
+```
+
+
 ## 1. Prefix
 
 เป็นตัวกำหนดว่า Private Key นี้ใช้สำหรับ Network อะไร
@@ -69,6 +93,7 @@ b'\x03\xb3\x11{'
 
 ![Frame 10](https://user-images.githubusercontent.com/120770468/223154670-7b5fa3ce-b2fd-479b-833f-6a3b2b967b5f.png)
 
+##
 
 - **Base58**(**Prefix** + **Private Key** + **Compressed** + **Checksum**)
 ```angular2html

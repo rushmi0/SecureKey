@@ -46,7 +46,7 @@ public class GenerateRawKey {
     }
 
     public static void main(String[] args) {
-        String hashResult = random();
+        String hashResult = KeyGan();
         System.out.println(hashResult);
     }
 }

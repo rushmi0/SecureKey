@@ -91,7 +91,7 @@ b'\x03\xb3\x11{'
 5KK6JrgvjhCttVbJ7NzohxQJkYzRpff9d5spV7JRJ3QoYd1A2pA
 ```
 
-![Frame 10](https://user-images.githubusercontent.com/120770468/223154670-7b5fa3ce-b2fd-479b-833f-6a3b2b967b5f.png)
+![Frame 10]( )
 
 ##
 

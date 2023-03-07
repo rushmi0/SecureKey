@@ -9,13 +9,12 @@ LOOP_TIME = 62000000       #  50วินาที
 def create_wif(private_key_hex: str) -> str:
     """ Prefix + Private Key + Checksum """
 
-    private_key_bytes = bytes.fromhex(private_key_hex)
+    private_key_bytes = bytes.fromhex("c51a52e294165cfde3342e8c12c5f3370d29d12401c03803fe34de78c80b1804")
     prefix = b'\x80'
     extended_key = prefix + private_key_bytes
     checksum = hashlib.sha256(hashlib.sha256(extended_key).digest()).digest()[:4]
     wif = base58.b58encode(extended_key + checksum)
     return wif.decode('utf-8')
-
 
 def create_wif_compressed(private_key_hex: str) -> str:
     """ Prefix + Private Key + Compressed + Checksum """
@@ -42,7 +41,7 @@ def random():
     ค่า Hash สุดท้ายจะถูกส่งออกเป็น สตริงรูปลักษณเลขฐาน16
     '''
 
-    for i in range(LOOP_TIME):
+    for i in range(3):
         hash_obj = hashlib.sha256(encoded_value)
         hash_result = hash_obj.hexdigest()
         encoded_value = hash_result.encode('utf-8')
@@ -82,14 +81,14 @@ def main():
     wif_compress = create_wif_compressed(Entropy)
     print("WIF Key [Compress]: %s length\n> %s\n" % (len(wif_compress), wif_compress))
 
-    #pubkey = wif_to_public_key(wif)
-    #print("Original Public Key: %s length\n> %s\n" % (len(pubkey), pubkey))
+    pubkey = wif_to_public_key(wif)
+    print("Original Public Key: %s length\n> %s\n" % (len(pubkey), pubkey))
 
-    #private_key = base58.b58decode(wif_compress)[1:-4]
-    #print("Private Key: %s length\n> %s\n" % (len(private_key), private_key.hex()))
+    private_key = base58.b58decode(wif_compress)[1:-4]
+    print("Private Key: %s length\n> %s\n" % (len(private_key), private_key.hex()))
 
-    #public_key = compress_public_key(pubkey)
-    #print("Public Key [Compress]: %s length\n> %s" % (len(public_key), public_key))
+    public_key = compress_public_key(pubkey)
+    print("Public Key [Compress]: %s length\n> %s" % (len(public_key), public_key))
 
 
 if __name__ == "__main__":

@@ -98,10 +98,19 @@ class Base58 {
         return (byte) remainder;
     }
 
+    // Test
     public static void main(String[] args) {
-        String key = "L4qW3DQmthwJHu7viFz5XsndPb3TfKhK4ycGmXPJKZrjAC3HLzuo";
+
+        //String key = "5KK6JrgvjhCttVbJ7NzohxQJkYzRpff9d5spV7JRJ3QoYd1A2pA";
+        String key = "L3prRpKEBSTW2HCNXA699mXsMECUZPdP4GXJb4otEDe4SZc7ooEa";
         byte[] decoded = Base58.decode(key);
-        System.out.println(Arrays.toString(decoded));
-        System.out.println(decoded);
+
+        System.out.println(Arrays.toString(decoded)+ "\n");
+        byte[] Original_Key = Arrays.copyOfRange(decoded, 1, 33);
+
+        System.out.println(Arrays.toString(Original_Key));
+
+        String prikey = WIF.byteArray_To_HexString(Original_Key);
+        System.out.println(new String("\nPrivate Key: \n\t└── " + prikey));
     }
 }

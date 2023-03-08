@@ -50,14 +50,14 @@ sudo cp -r ecdsa /usr/bin/python3.10
 ## 2. Private Key 
 สร้าง Private Key โดยนำค่าสุ่มมาไป Hash ด้วย [SHA256](https://emn178.github.io/online-tools/sha256.html)
 
-- **ผลลัพธ์ SHA256 Hash**
+### **ผลลัพธ์ SHA256 Hash**
 ```sh
 f845e3161183529214554ce0a746ed6326b2c02d40a72fae692206d40ebdaf86
 ```
 
 ![Entropy](https://user-images.githubusercontent.com/120770468/223739788-a3d63979-6f52-45f2-a884-814669bdc9d4.png)
 
-- **ผลลัพธ์ SHA256 รูปลักษณ์ Bytes ในภาษา Python**
+### **ผลลัพธ์ SHA256 รูปลักษณ์ Bytes ในภาษา Python**
 ```angular2html
 b'\xf8E\xe3\x16\x11\x83R\x92\x14UL\xe0\xa7F\xedc&\xb2\xc0-@\xa7/\xaei"\x06\xd4\x0e\xbd\xaf\x86'
 ```

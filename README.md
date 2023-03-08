@@ -41,7 +41,7 @@ sudo cp -r ecdsa /usr/bin/python3.10
 ![Prefix 80](https://user-images.githubusercontent.com/120770468/223716525-bf57e5a4-0f43-4a28-9ae1-c2dca94dc857.png)
 
 ### Testnet
-เป็นโครงข่ายที่ถูกใช้สำหรับการทดลองอะไรก็ตาม หรือทดลอง Protocol ใหม่ ๆ ก่อนที่จะนำไปใช้งานจริงใน Mainnet เพื่อไม่ให้เกิดความเสียหายในการใช้งานจริง (การใช้งานไม่มีค่าใช้จ่าย) 
+เป็นโครงข่ายที่ถูกใช้สำหรับการทดลองอะไรก็ตาม หรือทดลอง Protocol ใหม่ ๆ ก่อนที่จะนำไปใช้งานจริง เพื่อไม่ให้เกิดความเสียหายในการใช้งานจริง (การใช้งานไม่มีค่าใช้จ่าย) 
 
 - **Testnet** ⟵ **0xEF**
 
@@ -98,14 +98,16 @@ b'\xf3\xc9\xd8\x10'
 ## 5. Base58 Encode
 สุดท้ายนี้นำค่าทั้งหมดมาต่อกันตามลำดับ **(รูปลักษณ์ Bytes)** แล้วเข้ารหัสด้วย Base58. การเข้ารหัสนี้ไม่ได้ทำเพื่อความปลอดภัย เพียงแต่ทำให้มันดูง่าย ลดความผิดพลาดต่าง ๆ
 
-- **Base58**(**Prefix** + **Private Key** + **Checksum**)
+- **Base58** (**Prefix** + **Private Key** + **Checksum**)
 ```angular2html
-
+5KhdP7F1FpTDEa7LYtaMxJA6LjUBPXCdWFqkv1b5pDqTFkFWi7h
 ```
 
-##
+![version 1](https://user-images.githubusercontent.com/120770468/223781588-21b7cfa5-bc57-4c22-aa38-feb3e80a1f03.png)
 
-- **Base58**(**Prefix** + **Private Key** + **Compressed** + **Checksum**)
+
+
+- **Base58** (**Prefix** + **Private Key** + **Compressed** + **Checksum**)
 ```angular2html
-
+L5YKaaYp8QSgzu8yHkeFV4j8a6SxrQJL88WCpybSFRersccZgJqM
 ```

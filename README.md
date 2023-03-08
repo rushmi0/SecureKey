@@ -3,10 +3,6 @@
 **WIF** มาจากคำว่า **Wallet Import Format** เป็นรูปแบบมาตรฐาน **Private Key สำหรับ Bitcoin** เพราะด้วยรูปลักษณ์ Private Key เดิมๆ แล้วเป็นเลขฐาน16 ชุดหนึ่ง มันข้อนข้างดูยากมาก ๆ WIF Key จึงทำมาเพื่อให้รูปลักษณ์มันดูง่ายขึ้น ช่วยลดความผิดพลาดจากการกรอก Private Key ผิด
 
 
-## ขั้นตอนการสร้าง WIF Key
-ทั้งหมดนี้ทำในรูปลักษณ์ Bytes
-
-
 ## ติดตั้ง Module สำหรับ Python
 ```sh
 pip install base58
@@ -28,6 +24,10 @@ exit()
 sudo cp -r base58 /usr/bin/python3.10
 sudo cp -r ecdsa /usr/bin/python3.10
 ```
+
+## ขั้นตอนการสร้าง WIF Key
+ทั้งหมดนี้ทำในรูปลักษณ์ Bytes
+
 
 
 ## 1. Prefix
@@ -54,6 +54,8 @@ sudo cp -r ecdsa /usr/bin/python3.10
 ```sh
 c51a52e294165cfde3342e8c12c5f3370d29d12401c03803fe34de78c80b1804
 ```
+
+![Entropy](https://user-images.githubusercontent.com/120770468/223733548-f24bff54-5a98-4a04-bd53-dfe5e82ae566.png)
 
 - **ผลลัพธ์ SHA256 รูปลักษณ์ Bytes ในภาษา Python**
 ```angular2html

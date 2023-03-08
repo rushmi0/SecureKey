@@ -88,10 +88,12 @@ b'\xf3\xc9\xd8\x10\xc2\xd9<J\x13\xc4D\xf1f\xc0\xac\xf4\xd0\xdf\x08\x92#\x141\x11
 
 ![Hash](https://user-images.githubusercontent.com/120770468/223757335-b85070da-93a8-4906-884e-bc26e9c49aa4.png)
 
-### การหา **Checksum** นำผลลัพธ์ที่ได้ตัดเอามาเฉพาะ 4 Bytes แรก
+### หา **Checksum** โดยนำผลลัพธ์ที่ได้ตัดเอามาเฉพาะ 4 Bytes แรก
 ```angular2html
-
+b'\xf3\xc9\xd8\x10'
 ```
+
+![Checksum](https://user-images.githubusercontent.com/120770468/223770066-744054be-6a1e-46f2-b663-a607d6aec098.png)
 
 ## 5. Base58 Encode
 สุดท้ายนี้นำค่าทั้งหมดมาต่อกันตามลำดับ **(รูปลักษณ์ Bytes)** แล้วเข้ารหัสด้วย Base58. การเข้ารหัสนี้ไม่ได้ทำเพื่อความปลอดภัย เพียงแต่ทำให้มันดูง่าย ลดความผิดพลาดต่าง ๆ

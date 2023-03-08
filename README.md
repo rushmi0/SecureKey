@@ -52,10 +52,10 @@ sudo cp -r ecdsa /usr/bin/python3.10
 
 - **ผลลัพธ์ SHA256 Hash**
 ```sh
-c51a52e294165cfde3342e8c12c5f3370d29d12401c03803fe34de78c80b1804
+f845e3161183529214554ce0a746ed6326b2c02d40a72fae692206d40ebdaf86
 ```
 
-![Entropy](https://user-images.githubusercontent.com/120770468/223733548-f24bff54-5a98-4a04-bd53-dfe5e82ae566.png)
+![Entropy](https://user-images.githubusercontent.com/120770468/223736691-8b912344-333e-4746-831f-89c1f1c0b2c2.png)
 
 - **ผลลัพธ์ SHA256 รูปลักษณ์ Bytes ในภาษา Python**
 ```angular2html

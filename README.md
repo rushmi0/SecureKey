@@ -28,7 +28,7 @@ sudo cp -r ecdsa /usr/bin/python3.10
 ## ขั้นตอนการสร้าง WIF Key
 ทั้งหมดนี้ทำในรูปลักษณ์ Bytes
 
-#
+
 
 ## 1. Prefix
 
@@ -47,8 +47,6 @@ sudo cp -r ecdsa /usr/bin/python3.10
 
 ![Prefix EF](https://user-images.githubusercontent.com/120770468/223721619-fc7db06d-21b5-4439-8568-63219fe248d4.png)
 
-#
-
 ## 2. Private Key 
 สร้าง Private Key โดยนำค่าสุ่มมาไป Hash ด้วย [SHA256](https://emn178.github.io/online-tools/sha256.html)
 
@@ -64,15 +62,12 @@ f845e3161183529214554ce0a746ed6326b2c02d40a72fae692206d40ebdaf86
 b'\xf8E\xe3\x16\x11\x83R\x92\x14UL\xe0\xa7F\xedc&\xb2\xc0-@\xa7/\xaei"\x06\xd4\x0e\xbd\xaf\x86'
 ```
 
-#
-
 ## 3. Compression (optional)
 เป็นตัวกำหนดว่า Private Key นี้ใช้สำหรับสร้าง Public Key แบบบีบอัด ส่วนนี้เป็นตัวเลือกครับ จะใช้หรือไม่ใช้ก็ได้ ไม่บังคับ
 - **Compressed** ⟵ 0x01
 
 ![Compression](https://user-images.githubusercontent.com/120770468/223742705-428d9c67-8318-4fb9-8d16-ec00287037e3.png)
 
-#
 
 ## 4. Checksum
 นำค่า **Prefix + Private Key** มาต่อกัน **(เน้นย้ำว่าทำใน รูปลักษณ์ Bytes)** จากนั้นนำไปเข้า SHA256 Hash. นำผลลัพธ์ที่ได้ตัดเอาเฉพาะ 4 Bytes แรกมันคือค่า Checksum
@@ -97,8 +92,6 @@ b'\xf3\xc9\xd8\x10\xc2\xd9<J\x13\xc4D\xf1f\xc0\xac\xf4\xd0\xdf\x08\x92#\x141\x11
 ```angular2html
 
 ```
-
-#
 
 ## 5. Base58 Encode
 สุดท้ายนี้นำค่าทั้งหมดมาต่อกันตามลำดับ **(รูปลักษณ์ Bytes)** แล้วเข้ารหัสด้วย Base58. การเข้ารหัสนี้ไม่ได้ทำเพื่อความปลอดภัย เพียงแต่ทำให้มันดูง่าย ลดความผิดพลาดต่าง ๆ

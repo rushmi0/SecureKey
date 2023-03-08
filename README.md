@@ -73,27 +73,23 @@ b'\xf8E\xe3\x16\x11\x83R\x92\x14UL\xe0\xa7F\xedc&\xb2\xc0-@\xa7/\xaei"\x06\xd4\x
 
 ตัวอย่างนี้ เป็นรูปลักษณ์ Bytes จากภาษา Python ใช้เป็นเลขฐาน16 ขั้นตัวเลขด้วย **\x**
 
-- **Prefix** (Mainnet)
+
+
+### นำ **Prefix** มาต่อกับ **Private Key**
 ```angular2html
-b'\x80'
+b'\x80\xf8E\xe3\x16\x11\x83R\x92\x14UL\xe0\xa7F\xedc&\xb2\xc0-@\xa7/\xaei"\x06\xd4\x0e\xbd\xaf\x86'
 ```
 
-- **Private Key**
+![concatenate](https://user-images.githubusercontent.com/120770468/223755565-209589fb-6ecb-43a4-b956-30d8aa0120ee.png)
+
+### **[Prefix + Private Key]** หลังจากเชื่อมต่อกันแล้วนำไป Hash ด้วย **[SHA256]**
 ```angular2html
-b'\xf8E\xe3\x16\x11\x83R\x92\x14UL\xe0\xa7F\xedc&\xb2\xc0-@\xa7/\xaei"\x06\xd4\x0e\xbd\xaf\x86'
+b'\xf3\xc9\xd8\x10\xc2\xd9<J\x13\xc4D\xf1f\xc0\xac\xf4\xd0\xdf\x08\x92#\x141\x11\x82\x85\xd6\x8c\xb3\xc6\xca#'
 ```
 
-- **Prefix + Private Key**
-```angular2html
+![Hash](https://user-images.githubusercontent.com/120770468/223757335-b85070da-93a8-4906-884e-bc26e9c49aa4.png)
 
-```
-
-- **[Prefix + Private Key]** ⟶ **[SHA256]**
-```angular2html
-
-```
-
-- **[SHA256]** ⟶ **[First 4 Bytes]** ⟶ **Checksum**
+### การหา **Checksum** นำผลลัพธ์ที่ได้ตัดเอามาเฉพาะ 4 Bytes แรก
 ```angular2html
 
 ```

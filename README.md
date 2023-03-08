@@ -55,7 +55,7 @@ sudo cp -r ecdsa /usr/bin/python3.10
 f845e3161183529214554ce0a746ed6326b2c02d40a72fae692206d40ebdaf86
 ```
 
-![Entropy](https://user-images.githubusercontent.com/120770468/223739788-a3d63979-6f52-45f2-a884-814669bdc9d4.png)
+![Entropy](https://user-images.githubusercontent.com/120770468/223761504-3afb9649-6304-4a87-bfd2-9bc3e311ddaf.png)
 
 ### **ผลลัพธ์ SHA256 รูปลักษณ์ Bytes ในภาษา Python**
 ```angular2html

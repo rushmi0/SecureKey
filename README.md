@@ -32,19 +32,30 @@ sudo cp -r ecdsa /usr/bin/python3.10
 
 ## 1. Prefix
 
-เป็นตัวกำหนดว่า Private Key นี้ใช้สำหรับ Network อะไร
+ตัวเลขข้างหน้าสุด ส่วนนี้เป็นตัวกำหนดว่า Private Key นี้ใช้สำหรับ Network อะไร
+
+### Mainnet 
+เป็นโครงข่ายที่ใช้งานจริง
 - **Mainnet** ⟵ **0x80**
+
+![Prefix 80](https://user-images.githubusercontent.com/120770468/223716525-bf57e5a4-0f43-4a28-9ae1-c2dca94dc857.png)
+
+### Testnet
+เป็นโครงข่ายที่ถูกใช้สำหรับ ทดลองต่าง ๆ (การใช้งานไม่มีค่าใช้จ่าย) ก่อนที่จะนำไปใช้งานจริงใน Mainnet
+
 - **Testnet** ⟵ **0xEF**
 
+![Prefix EF](https://user-images.githubusercontent.com/120770468/223720798-f75a4dd4-e650-4104-a2c4-e190e1b49b0a.png)
+
 ## 2. Private Key 
-นำค่าสุ่มมาชุดหนึ่งไป Hash ด้วย SHA256
+สร้าง Private Key โดยนำค่าสุ่มมาไป Hash ด้วย [SHA256](https://emn178.github.io/online-tools/sha256.html)
 
 - **ผลลัพธ์ SHA256 Hash**
 ```sh
 c51a52e294165cfde3342e8c12c5f3370d29d12401c03803fe34de78c80b1804
 ```
 
-- **ผลลัพธ์ SHA256 รูปลักษณ์ Bytes**
+- **ผลลัพธ์ SHA256 รูปลักษณ์ Bytes ในภาษา Python**
 ```angular2html
 b'\xc5\x1aR\xe2\x94\x16\\\xfd\xe34.\x8c\x12\xc5\xf37\r)\xd1$\x01\xc08\x03\xfe4\xdex\xc8\x0b\x18\x04'
 ```

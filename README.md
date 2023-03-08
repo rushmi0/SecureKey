@@ -32,7 +32,7 @@ sudo cp -r ecdsa /usr/bin/python3.10
 
 ## 1. Prefix
 
-ตัวเลขข้างหน้าสุด ส่วนนี้เป็นตัวกำหนดว่า Private Key นี้ใช้สำหรับ Network อะไร
+ตัวเลขหน้าสุด ส่วนนี้เป็นตัวกำหนดว่า Private Key นี้ใช้สำหรับ Network อะไร
 
 ### Mainnet 
 เป็นโครงข่ายที่ใช้งานจริง
@@ -41,11 +41,11 @@ sudo cp -r ecdsa /usr/bin/python3.10
 ![Prefix 80](https://user-images.githubusercontent.com/120770468/223716525-bf57e5a4-0f43-4a28-9ae1-c2dca94dc857.png)
 
 ### Testnet
-เป็นโครงข่ายที่ถูกใช้สำหรับ ทดลองต่าง ๆ (การใช้งานไม่มีค่าใช้จ่าย) ก่อนที่จะนำไปใช้งานจริงใน Mainnet
+เป็นโครงข่ายที่ถูกใช้สำหรับการทดลองอะไรก็ตาม หรือทดลอง Protocol ใหม่ ๆ ก่อนที่จะนำไปใช้งานจริงใน Mainnet เพื่อไม่ให้เกิดความเสียหายในการใช้งานจริง (การใช้งานไม่มีค่าใช้จ่าย) 
 
 - **Testnet** ⟵ **0xEF**
 
-![Prefix EF](https://user-images.githubusercontent.com/120770468/223720798-f75a4dd4-e650-4104-a2c4-e190e1b49b0a.png)
+![Prefix EF](https://user-images.githubusercontent.com/120770468/223721619-fc7db06d-21b5-4439-8568-63219fe248d4.png)
 
 ## 2. Private Key 
 สร้าง Private Key โดยนำค่าสุ่มมาไป Hash ด้วย [SHA256](https://emn178.github.io/online-tools/sha256.html)

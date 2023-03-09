@@ -17,6 +17,8 @@ import ecdsa
 exit()
 ```
 
+![Screenshot from 2023-03-09 16-38-51](https://user-images.githubusercontent.com/120770468/223981983-f4c87ed7-8376-4932-9e28-231634fbaa24.png)
+
 ## ถ้าทำตามด้านบนแล้วยังใช้ไม่ได้
 โหลด File นั้นมาเลย แล้วแตก File จากนั้นเข้าไปข้างใน เราจะคัดลอก Module ไปที่ python3.10 library root
 - สำหรับ **Ubuntu, Debian** 

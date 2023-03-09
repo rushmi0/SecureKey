@@ -48,7 +48,7 @@ sudo cp -r ecdsa /usr/bin/python3.10
 ![Prefix EF](https://user-images.githubusercontent.com/120770468/223721619-fc7db06d-21b5-4439-8568-63219fe248d4.png)
 
 ## 2. Private Key 
-สร้าง Private Key โดยนำค่าสุ่มมาไป Hash ด้วย [SHA256](https://emn178.github.io/online-tools/sha256.html)
+สร้าง Private Key โดยนำค่าสุ่มไป Hash ด้วย [SHA256](https://emn178.github.io/online-tools/sha256.html)
 
 ### **ผลลัพธ์ SHA256 Hash**
 ```sh

@@ -25,6 +25,8 @@ sudo cp -r base58 /usr/bin/python3.10
 sudo cp -r ecdsa /usr/bin/python3.10
 ```
 
+![ter-ecdsa](https://user-images.githubusercontent.com/120770468/223978164-f9e51085-7d4d-46bc-ad04-f6292dc74964.png)
+
 ## ขั้นตอนการสร้าง WIF Key
 ทั้งหมดนี้ทำในรูปลักษณ์ Bytes
 

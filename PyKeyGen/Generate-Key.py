@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import hashlib
 import base58 # https://pypi.org/project/base58/
 import ecdsa # https://pypi.org/project/ecdsa/

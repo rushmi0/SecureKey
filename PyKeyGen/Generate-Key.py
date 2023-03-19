@@ -6,8 +6,8 @@ import ecdsa  # https://pypi.org/project/ecdsa/
 import time
 import os
 
-ENTROPY_LENGTH = 64  # ปรับแก้จำนวน Bytes ตามต้องการ
-LOOP_TIME = 62000000  # 50วินาที
+ENTROPY_LENGTH = 512  # ปรับแก้จำนวน Bytes ตามต้องการ
+LOOP_TIME = 62000000 
 
 
 def create_wif(private_key_hex: str) -> str:
@@ -48,11 +48,13 @@ def random():
         hash_result = hash_obj.hexdigest()
         encoded_value = hash_result.encode('utf-8')
 
+        """
         print(current_time + ' | '
                              '\033[38;2;251;44;114mPrivate Key\033[0m'
                              ' : '
                              '\033[38;2;152;168;248m%s\033[0m '
                              '\033[38;2;63;218;142m[%s]\033[0m' % (hash_result, i + 1))
+        """
 
     return hash_result
 

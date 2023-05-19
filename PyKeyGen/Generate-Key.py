@@ -48,14 +48,6 @@ def random():
         hash_result = hash_obj.hexdigest()
         encoded_value = hash_result.encode('utf-8')
 
-        """
-        print(current_time + ' | '
-                             '\033[38;2;251;44;114mPrivate Key\033[0m'
-                             ' : '
-                             '\033[38;2;152;168;248m%s\033[0m '
-                             '\033[38;2;63;218;142m[%s]\033[0m' % (hash_result, i + 1))
-        """
-
     return hash_result
 
 

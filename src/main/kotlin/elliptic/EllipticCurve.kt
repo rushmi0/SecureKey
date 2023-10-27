@@ -87,7 +87,8 @@ object EllipticCurve {
 
 
     fun addPoint(
-        point1: PointField, point2: PointField
+        point1: PointField,
+        point2: PointField
     ): PointField {
         if (point1 == point2) {
             return doublePoint(point1)

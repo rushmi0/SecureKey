@@ -25,24 +25,6 @@ object EllipticCurve {
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
 
     /*
-    * `isPointOnCurve` Metd นี้ใช้เพื่อตรวจสอบว่าจุดที่รับเข้ามานั้นอยู่บนเส้นโค้งวงรีหรือไม่
-    * โดยการรับค่า point เพื่อนำไปคำนวณตามสมการเส้นโค้งวงรี และตรวจสอบว่าสมการที่ได้มีค่าเท่ากันหรือไม่ และจะคืนค่าเป็น true หากสมการมีค่าเท่ากัน
-    * */
-    fun isPointOnCurve(point: PointField?): Boolean {
-        val (x, y) = point
-        // ! ถ้าค่า point ที่รับเข้ามาเป็น null ให้ส่งค่า Exception กลับไป
-            ?: throw IllegalArgumentException("`isPointOnCurve` Method Point is null")
-
-        // * ตรวจสอบว่าจุดนั้นเป็นไปตามสมการเส้นโค้งวงรี หรือไม่: y^2 = x^3 + Ax + B (mod P)
-        val leftSide = (y * y) % P // leftSide เป็นค่า y^2 และรนำไป mod P
-        val rightSide = (x.pow(3) + A * x + B) % P // rightSide เป็นค่า x^3 + Ax + B และรนำไป mod P
-
-        return leftSide == rightSide
-    }
-
-    // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
-
-    /*
     * Function สำหรับคำนวณ modular inverse
     * https://www.dcode.fr/modular-inverse
     * */

@@ -10,6 +10,7 @@ class CurveDomain(name: String) {
     val params = when (name) {
 
 
+        // มีขนาด Public Key Bytes ทั้งหมด 64 Bytes
         "secp192k1" -> {
             val A = BigInteger.ZERO
             val B = BigInteger.valueOf(3)

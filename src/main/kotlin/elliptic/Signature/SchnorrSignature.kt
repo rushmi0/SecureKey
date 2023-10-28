@@ -4,6 +4,7 @@ package ecc.signature
 
 
 import elliptic.EllipticCurve
+import elliptic.EllipticCurve.multiplyPoint
 import elliptic.PointField
 import elliptic.Secp256K1
 import util.Hashing.SHA256
@@ -17,9 +18,9 @@ import java.security.SecureRandom
     * https://medium.com/bitbees/what-the-heck-is-schnorr-52ef5dba289f
     * */
 
-    // ! SchnorrSignature ยังใช้ไม่ได้
+    // ! Schnorr Signature ยังใช้ไม่ได้
 
-object SchnorrSignature {
+object Schnorr {
 
 
     // * Parameters secp256k1
@@ -27,14 +28,14 @@ object SchnorrSignature {
     private val N: BigInteger = curveDomain.N
     
 
-    fun SignSignatures(privateKey: BigInteger, message: BigInteger): Pair<BigInteger, BigInteger> {
+    fun sign(privateKey: BigInteger, message: BigInteger): Pair<BigInteger, BigInteger> {
 
         val z = BigInteger(256, SecureRandom())
         val R = EllipticCurve.multiplyPoint(z) // R = z * G
 
         val r = R.x % N // พิกัด x ของ R
 
-        val hashInput = r.toByteArray() + EllipticCurve.multiplyPoint(privateKey).x.toByteArray() + message.toByteArray()
+        val hashInput = r.toByteArray() + multiplyPoint(privateKey).x.toByteArray() + message.toByteArray()
         val hash = hashInput.ByteArrayToHex().SHA256() // Hash256(r || P || m)
 
         val k = privateKey
@@ -44,15 +45,15 @@ object SchnorrSignature {
     }
 
 
-    fun VerifySignature(publicKey: PointField, message: BigInteger, signature: Pair<BigInteger, BigInteger>): Boolean {
+    fun verify(publicKey: PointField, message: BigInteger, signature: Pair<BigInteger, BigInteger>): Boolean {
         val (r, s) = signature
 
-        val R = EllipticCurve.multiplyPoint(r) // Public key : R = r*G
+        val R = multiplyPoint(r) // Public key : R = r*G
         val hashInput = r.toByteArray() + publicKey.x.toByteArray() + message.toByteArray()
         val hash = hashInput.ByteArrayToHex().SHA256()  // Hash of (r || P || m)
-        val PHash = EllipticCurve.multiplyPoint(BigInteger(hash, 16), publicKey) // Hash(r || P || m)*P
+        val PHash = multiplyPoint(BigInteger(hash, 16), publicKey) // Hash(r || P || m)*P
 
-        val sG = EllipticCurve.multiplyPoint(s) // s*G
+        val sG = multiplyPoint(s) // s*G
 
         val leftSide = EllipticCurve.addPoint(R, PHash) // R + Hash(r || P || m)*P
 

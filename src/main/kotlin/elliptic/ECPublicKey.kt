@@ -1,8 +1,13 @@
 package elliptic
 
-import elliptic.EllipticCurve.curve
+import elliptic.EllipticCurve.P
+import elliptic.EllipticCurve.A
+import elliptic.EllipticCurve.B
+import elliptic.EllipticCurve.multiplyPoint
+
 import util.ShiftTo.ByteArrayToBigInteger
 import util.ShiftTo.HexToByteArray
+
 import java.math.BigInteger
 
 object ECPublicKey {
@@ -12,9 +17,48 @@ object ECPublicKey {
     * ปรับแต่ง Public key
     * */
 
+
+    /*
+    * `isPointOnCurve` Method นี้ใช้เพื่อตรวจสอบว่าจุดที่รับเข้ามานั้นอยู่บนเส้นโค้งวงรีหรือไม่
+    * โดยการรับค่า point เพื่อนำไปคำนวณตามสมการเส้นโค้งวงรี และตรวจสอบว่าสมการที่ได้มีค่าเท่ากันหรือไม่ และจะคืนค่าเป็น true หากสมการมีค่าเท่ากัน
+    * */
+    private fun isPointOnCurve(point: PointField?): Boolean {
+        val (x, y) = point
+        // ! ถ้าค่า point ที่รับเข้ามาเป็น null ให้ส่งค่า Exception กลับไป
+            ?: throw IllegalArgumentException("`isPointOnCurve` Method Point is null")
+
+        // * ตรวจสอบว่าจุดนั้นเป็นไปตามสมการเส้นโค้งวงรี หรือไม่: y^2 = x^3 + Ax + B (mod P)
+        val leftSide = (y * y) % P // leftSide เป็นค่า y^2 และรนำไป mod P
+        val rightSide = (x.pow(3) + A * x + B) % P // rightSide เป็นค่า x^3 + Ax + B และรนำไป mod P
+
+        return leftSide == rightSide
+    }
+
+
+    // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
+
+    // รับค่า private key และคืนค่า public key ในรูปแบบพิกัดบนเส้นโค้งวงรี พิกัด x และ y จะเป็นค่า BigInteger เลขฐาน 10
+    private fun generatePoint(k: BigInteger): PointField {
+        // คำนวณค่าพิกัดบนเส้นโค้งวงรีจาก private key
+        val point = multiplyPoint(k)
+
+        // ตรวจสอบว่าจุดที่ได้มานั้นอยู่บนเส้นโค้งวงรีหรือไม่
+        if (!isPointOnCurve(point)) {
+            throw IllegalArgumentException("Invalid private key")
+        }
+
+        // คืนค่าพิกัดบนเส้นโค้งวงรี
+        return point
+    }
+
+
+    // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
+
+
+
     private fun fullPublicKeyPoint(k: BigInteger): String {
         try {
-            val point: PointField = EllipticCurve.multiplyPoint(k)
+            val point: PointField = multiplyPoint(k)
             val xHex: String = point.x.toString(16)
             val yHex: String = point.y.toString(16)
 
@@ -52,6 +96,8 @@ object ECPublicKey {
     }
 
 
+    // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
+
 
 
     private fun groupSelection(publicKey: String): String {
@@ -75,6 +121,10 @@ object ECPublicKey {
         }
     }
 
+
+    // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
+
+
     private fun decompressPublicKey(compressedPublicKey: String): PointField? {
         try {
             // แปลง compressed public key ในรูปแบบ Hex เป็น ByteArray
@@ -87,22 +137,25 @@ object ECPublicKey {
             val isYEven: Boolean = byteArray[0] == 2.toByte()
 
             // คำนวณค่า x^3 (mod P)
-            val xCubed: BigInteger = xCoord.modPow(BigInteger.valueOf(3), curve.P)
+            val xCubed: BigInteger = xCoord.modPow(BigInteger.valueOf(3), P)
 
             // คำนวณ Ax (mod P)
-            val Ax: BigInteger = xCoord.multiply(curve.A) % curve.P
+            val Ax: BigInteger = xCoord.multiply(A) % P
 
             // คำนวณ y^2 = x^3 + Ax + B (mod P)
-            val ySquared: BigInteger = xCubed.add(Ax).add(curve.B) % curve.P
+            val ySquared: BigInteger = xCubed.add(Ax).add(B) % P
 
             // คำนวณค่า y จาก y^2 โดยใช้ square root
-            val y: BigInteger = ySquared.modPow(curve.P.add(BigInteger.ONE).divide(BigInteger.valueOf(4)), curve.P)
+            val y: BigInteger = ySquared.modPow(
+                P.add(BigInteger.ONE).divide(BigInteger.valueOf(4)),  // (P + 1) / 4
+                P
+            )
 
             // ตรวจสอบว่า y^2 เป็นเลขคู่หรือไม่
             val isYSquareEven: Boolean = y.mod(BigInteger("2")) == BigInteger.ZERO
 
             // คำนวณค่า y โดยแก้ไขเครื่องหมายตามผลลัพธ์ที่ได้จากการตรวจสอบ
-            val computedY: BigInteger = if (isYSquareEven != isYEven) curve.P.subtract(y) else y
+            val computedY: BigInteger = if (isYSquareEven != isYEven) P.subtract(y) else y
 
             // สร้าง PointField จาก x และ y ที่ได้
             return PointField(xCoord, computedY)
@@ -130,6 +183,10 @@ object ECPublicKey {
 
     fun String.compressed(): String {
         return groupSelection(this)
+    }
+
+    fun BigInteger.toPoint(): PointField {
+        return generatePoint(this)
     }
 
 }

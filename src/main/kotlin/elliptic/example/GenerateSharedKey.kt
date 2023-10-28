@@ -39,8 +39,4 @@ fun main() {
     println("\nShared Key A: $sharedKeyA")
     println("Shared Key B: $sharedKeyB")
 
-    // * ตรวจสอบ Shared Key ของทั้ง 2 ฝ่ายว่าเป็นค่าเดียวกันหรือไม่
-    val check = sharedKeyA == sharedKeyB
-    println("\nShared Key A == Shared Key B: $check")
-
 }

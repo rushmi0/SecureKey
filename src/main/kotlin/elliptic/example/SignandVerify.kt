@@ -1,5 +1,6 @@
 package elliptic.example
 
+import elliptic.ECPublicKey.toPoint
 import elliptic.EllipticCurve.multiplyPoint
 import elliptic.PointField
 import elliptic.Signature.ECDSA
@@ -8,14 +9,15 @@ import elliptic.Signature.ECDSA.toDERencode
 import util.ShiftTo.ByteArrayToHex
 import java.math.BigInteger
 import java.security.MessageDigest
+import java.security.SecureRandom
 
 fun main() {
 
-    //val privateKey = BigInteger(256, SecureRandom())
-    val privateKey = BigInteger("97ddae0f3a25b92268175400149d65d6887b9cefaf28ea2c078e05cdc15a3c0a", 16)
+    val privateKey = BigInteger(256, SecureRandom())
+    //val privateKey = BigInteger("97ddae0f3a25b92268175400149d65d6887b9cefaf28ea2c078e05cdc15a3c0a", 16)
 
     // * สร้าง Public Key จาก Private Key โดยผลลัพธ์ที่ได้จะเป็นพิกัดจุดบนเส้นโค้งวงรี
-    val curvePoint: PointField = multiplyPoint(privateKey)
+    val curvePoint: PointField = privateKey.toPoint()
     println("\nKey PointField: $curvePoint")
 
     // * ข้อความที่จะลงนาม
@@ -50,7 +52,6 @@ fun main() {
     // * ตรวจสอบลายเซ็น
     val verify: Boolean = ECDSA.verify(publicKeyPoint, hashInt, signature)
     println("Verify: $verify")
-
 
 
 }

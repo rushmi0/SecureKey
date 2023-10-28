@@ -23,16 +23,30 @@ object ECDSA {
     private val curveDomain: Secp256K1.CurveParams = Secp256K1.getCurveParams()
     private val N: BigInteger = curveDomain.N
 
-    fun sign(privateKey: BigInteger, message: BigInteger): Pair<BigInteger, BigInteger> {
+    // * สร้างลายเซ็น โดยรับค่า private key และ message ที่ต้องการลงลายเซ็น และคืนค่าเป็นคู่ของ BigInteger (r, s)
+    fun sign(
+        privateKey: BigInteger,
+        message: BigInteger
+    ): Pair<BigInteger, BigInteger> {
         val m = message
         //val k = BigInteger("42854675228720239947134362876390869888553449708741430898694136287991817016610")
+
+        // ค่า k คือค่า random ที่สร้างขึ้นมาเพื่อใช้ในการคำนวณ เพื่อให้เลยลายเซ็นที่สร้างขึ้นมาไม่ซ้ำกัน
         val k = BigInteger(256, SecureRandom())
 
+        // นำค่าที่สุ่มได้มาคูณกับจุด G จะได้จุดบนเส้นโค้งวงรี ซึ่งเป็นส่วนสำคัญในการสร้างลายเซ็น
         val point: PointField = multiplyPoint(k)
+
+        // สูตรคำนวณค่า k^-1 mod N โดยใช้เมธอด modinv ที่เขียนไว้ใน `EllipticCurve.kt` และ N คือค่าที่กำหนดใน curve domain
         val kInv: BigInteger = modinv(k, N)
 
+        // สูตรคำนวณค่า r โดยใช้ x mod N
         val r: BigInteger = point.x % N
-        var s: BigInteger = ((m + r * privateKey) * kInv) % N
+
+        // สูตรคำนวณค่า s ขั้นตอนแรกนำต่า m มาบวกกับ r * privateKey ผลลัพธ์ที่ได้จะถูก mod N และนำไปคูณกับ kInv และ mod N อีกครั้ง
+        var s = (m + r * privateKey) * kInv % N
+        // var s: BigInteger = ((m + r * privateKey) * kInv) % N
+
 
         // * https://github.com/bitcoin/bips/blob/master/bip-0146.mediawiki
         if (s > N.shiftRight(1)) {

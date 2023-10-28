@@ -1,7 +1,13 @@
 package elliptic
 
 
+import elliptic.ECPublicKey.compressed
+import elliptic.ECPublicKey.toPoint
+import elliptic.ECPublicKey.toPublicKey
+
 import java.math.BigInteger
+import java.security.SecureRandom
+
 /*
 * อ้างอิงจาก
 * https://github.com/wobine/blackboard101/blob/master/EllipticCurvesPart5-TheMagic-SigningAndVerifying.py
@@ -12,14 +18,17 @@ import java.math.BigInteger
 
 object EllipticCurve {
 
+
     // * กำหนดค่าพื้นฐานของเส้นโค้งวงรี โดยใส่ชื่อเส้นโค้งวงรีที่ต้องการใช้งาน
-    val curve = CurveDomain("secp256k1").params
+    private val curve = CurveDomain("secp256k1").params
+
 
     // * ค่า A, B, P, G ที่ใช้ในการคำนวณ
     val A: BigInteger = curve.A
     val B: BigInteger = curve.B
     val P: BigInteger = curve.P
     val G: PointField = curve.G
+
 
 
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
@@ -34,37 +43,27 @@ object EllipticCurve {
     fun doublePoint(point: PointField?): PointField {
 
         // * ทำการแยกพิกัด x และ y ออกมาจาก `point` ลักษณะข้อมูลของ พิกัด x และ y จะเป็นค่า BigInteger เลขฐาน 10 เพื่อใช้ในการคำนวณต่อไป
-        val (x, y) = point
-        // ! ถ้าค่า point ที่รับเข้ามาเป็น null ให้ส่งค่า Exception กลับไป
-            ?: throw IllegalArgumentException("`doublePoint` Method Point is null")
+        val (x, y) = point ?: throw IllegalArgumentException("`doublePoint` Method Point is null")
 
         // * คำนวณค่า slope ด้วยสูตร (3 * x^2 + A) * (2 * y)^-1 mod P
         val slope = (BigInteger.valueOf(3) * x * x + A) % P
 
-        // *  คำนวณค่า lam_denom = (2 * y) mod P
+        // * คำนวณค่า lam_denom ด้วยสูตร (2 * y) mod P
         val lam_denom = (BigInteger.valueOf(2) * y) % P
 
-        // * คำนวณค่า lam = slope * (lam_denom)^-1 mod P
+        // * คำนวณค่า lam ด้วยสูตร slope * lam_denom^-1 mod P
         val lam = (slope * modinv(lam_denom)) % P
 
-        // * คำนวณค่า xR = (lam^2 - 2 * x) mod P
+        // * คำนวณค่า xR ด้วยสูตร lam^2 - 2 * x mod P
         val xR = (lam * lam - BigInteger.valueOf(2) * x) % P
 
-
-        /*
-        * < จุดใหม่ที่ได้หลังจากการคูณด้วย 2 บนเส้นโค้งวงรี >
-        *  คำนวณค่า yR = (lam * (x - xR) - y) mod P เป็นส่วนที่คำนวณหาค่า y  ของจุดใหม่หลังจากการคูณด้วย 2 บนเส้นโค้งวงรี
-        *
-        *  lam   คือค่าเอียงของเส้นที่ผ่านจุดเดิมและจุดใหม่หลังจากการคูณด้วย 2 บนเส้นโค้งวงรี
-        *  x      คือค่า x ของจุดเดิม
-        *  xR    คือค่า x ของจุดใหม่หลังจากการคูณด้วย 2 บนเส้นโค้งวงรี
-        *  y     คือค่า y ของจุดเดิม
-        *
-        * นำค่าเหล่านี้มาใช้เพื่อหาค่า yR ใหม่ที่ถูกปรับเพิ่มหรือลดจากค่า y ของจุดเดิม โดยการคูณ lam กับผลต่างระหว่าง x และ xR
-        * */
+        // * คำนวณค่า yR ด้วยสูตร lam * (x - xR) - y mod P
         val yR = (lam * (x - xR) - y) % P
 
-        return PointField(xR, (yR + P) % P)
+        return PointField(
+            xR, // * ส่งค่า xR กลับไป
+            (yR + P) % P // * นำ yR มาบวกกับ P และ mod P เพื่อให้ค่า yR เป็นบวก เนื่องจากค่า yR อาจจะเป็นค่าลบได้
+        )
     }
 
 
@@ -116,7 +115,7 @@ object EllipticCurve {
             var currentPoint = current
 
             // * วนลูปตามจำนวน binary digits ของ k
-            for (i in 1 until binary.length) {
+            for (i in 1..<binary.length) {
                 currentPoint = doublePoint(currentPoint)
 
                 // * ถ้า binary digit ที่ตำแหน่ง i เป็น '1'  ให้บวกจุดเริ่มต้น (current) เข้ากับจุดปัจจุบัน (currentPoint)

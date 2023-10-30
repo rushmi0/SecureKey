@@ -9,8 +9,8 @@ import java.security.SecureRandom
 
 fun main() {
 
-    val privateKey = BigInteger(256, SecureRandom())
-    //val privateKey = BigInteger("97ddae0f3a25b92268175400149d65d6887b9cefaf28ea2c078e05cdc15a3c0a", 16)
+    //val privateKey = BigInteger(256, SecureRandom())
+    val privateKey = BigInteger("7f7ff03d123792d6ac594bfa67bf6d0c0ab55b6b1fdb6249303fe861f1ccba9a", 16)
     println("[H] Private key: ${privateKey.toString(16)}")
     println("Private key: $privateKey")
 

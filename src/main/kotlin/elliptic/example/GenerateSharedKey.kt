@@ -39,4 +39,7 @@ fun main() {
     println("\nShared Key A: $sharedKeyA")
     println("Shared Key B: $sharedKeyB")
 
+
+    println(sharedKeyA.length)
+
 }

@@ -29,13 +29,13 @@ object ECDHkey {
         val point: PointField = publicKey.keyRecovery()
             ?: throw IllegalArgumentException("Invalid or unsupported public key format")
 
+        // คำนวณค่าจุดบนเส้นโค้งวงรีจาก private key โดยใช้เมธอด `generatePoint` ที่เขียนไว้ใน `ECPublicKey.kt`
         val curvePoint = multiplyPoint(
-            privateKey, // นี่เป็นค่า Private Key ของตัวเอง
-
-            // นี่คือค่า x และ y ของจุดบนเส้นโค้งวงรีที่มาจาก public key ของฝ่ายตรงข้าม
+            privateKey,
             point
         )
 
+        // เอาเฉพาะพิกัด x และแปลงเป็นเลขฐาน 16 ก่อนคืนค่ากลับไป
         return curvePoint.x.toString(16)
     }
 

@@ -5,6 +5,7 @@ import util.ShiftTo.HexToByteArray
 // Copyright (c) 2020 Figure Technologies Inc.
 // The contents of this file were derived from an implementation
 // by the btcsuite developers https://github.com/btcsuite/btcutil.
+// https://gist.github.com/iramiller/4ebfcdfbc332a9722c4a4abeb4e16454
 
 // Copyright (c) 2017 The btcsuite developers
 // Use of this source code is governed by an ISC
@@ -226,7 +227,7 @@ fun main() {
     val pubKeyA = "6933d7ead29b3983d17007e9d8b77d0f2568f92576d3469f7c68b6817d13275d"
     Bech32.encode("npub", pubKeyA.HexToByteArray().toBech32Data("ln").fiveBitData).let { println(it) }
 
-    val decode1 = Bech32.decode("nsec10allq0gjx7fddtzef0ax00mdps9t2kmtrldkyjfs8l5xruwvh2dq0lhhkp").data.ByteArrayToHex()
+    val decode1 = Bech32.decode("npub1ujevvncwfe22hv6d2cjv6pqwqhkvwlcvge7vgm3vcn2max9tu03sgze8ry").data.ByteArrayToHex()
     println(decode1)
 
     /**

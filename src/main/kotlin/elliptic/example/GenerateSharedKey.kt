@@ -3,6 +3,7 @@ package elliptic.example
 import elliptic.ECDHkey
 import elliptic.ECPublicKey.compressed
 import elliptic.ECPublicKey.toPublicKey
+import elliptic.EllipticCurve.B
 import java.math.BigInteger
 import java.security.SecureRandom
 

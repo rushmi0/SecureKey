@@ -12,20 +12,14 @@ object Hashing {
         return sha256.digest(firstHash)
     }
 
-    fun ByteArray._SHA256(): ByteArray {
-        val digest = MessageDigest.getInstance("SHA-256")
-        return digest.digest(this)
-    }
 
-    fun String.SHA256(): String {
-        val digest = MessageDigest.getInstance("SHA-256")
-        return digest.digest(this.HexToByteArray()).ByteArrayToHex()
-    }
-
-    fun ByteArray.SHA256(): String {
-        val digest = MessageDigest.getInstance("SHA-256")
-        return digest.digest(this).ByteArrayToHex()
+    fun ByteArray.SHA256(): ByteArray {
+        return MessageDigest.getInstance("SHA-256").digest(this)
     }
 
 
+    fun String.SHA256(): ByteArray {
+        return toByteArray().SHA256()
+    }
 }
+

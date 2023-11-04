@@ -1,12 +1,7 @@
 package elliptic
 
 
-import elliptic.ECPublicKey.compressed
-import elliptic.ECPublicKey.toPoint
-import elliptic.ECPublicKey.toPublicKey
-
 import java.math.BigInteger
-import java.security.SecureRandom
 
 /*
 * อ้างอิงจาก
@@ -20,15 +15,14 @@ object EllipticCurve {
 
 
     // * กำหนดค่าพื้นฐานของเส้นโค้งวงรี โดยใส่ชื่อเส้นโค้งวงรีที่ต้องการใช้งาน
-    //private val curve = CurveDomain("secp256k1").params
-    private val curve = CurveDomain("secp192k1").params
+    private val curve = CurveDomain("secp256k1").params
 
     // * ค่า A, B, P, G ที่ใช้ในการคำนวณ
     val A: BigInteger = curve.A
     val B: BigInteger = curve.B
+    val N: BigInteger = curve.N
     val P: BigInteger = curve.P
     val G: PointField = curve.G
-
 
 
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
@@ -37,7 +31,7 @@ object EllipticCurve {
     * Function สำหรับคำนวณ modular inverse
     * https://www.dcode.fr/modular-inverse
     * */
-    fun modinv(A: BigInteger, N: BigInteger = P) = A.modInverse(N)
+    fun modinv(A: BigInteger, N: BigInteger = P): BigInteger = A.modInverse(N)
 
 
     fun doublePoint(point: PointField?): PointField {
@@ -135,6 +129,7 @@ object EllipticCurve {
 
 
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
+
 
 
 }

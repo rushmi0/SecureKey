@@ -1,5 +1,7 @@
 package elliptic
 
+import elliptic.ECPublicKey.compressed
+import elliptic.ECPublicKey.keyRecovery
 import elliptic.ECPublicKey.toPublicKey
 import elliptic.ECPublicKey.verifyPoint
 import elliptic.EllipticCurve.P
@@ -13,6 +15,10 @@ import util.ShiftTo.HexToByteArray
 
 import java.math.BigInteger
 import java.security.SecureRandom
+
+import fr.acinq.secp256k1.Secp256k1.Companion.signSchnorr
+import fr.acinq.secp256k1.Secp256k1.Companion.verifySchnorr
+import java.security.MessageDigest
 
 object ECPublicKey {
 
@@ -228,19 +234,12 @@ object ECPublicKey {
 
 fun main() {
 
-    val privateKey = BigInteger(256, SecureRandom())
-    println("Private Key: $privateKey")
 
-    val publicKey = privateKey.toPublicKey()
-    println("Public Key: $publicKey")
-
-
-
-    val x = BigInteger("103443196931634335679118344570783123314721420590483894750891048854236441600995")
+    val x = BigInteger("54937464590658530654488624268151724241105264383655924818230768164485909069475")
     val p = BigInteger("115792089237316195423570985008687907853269984665640564039457584007908834671663")
 
     // หาค่า y จาก x โดยใช้สมการของเส้นโค้ง secp256k1
-    val ySquared = (x.pow(3) + EllipticCurve.B) % p
+    val ySquared = (x.pow(3) + B) % p
 
     // หาค่า y โดยใช้ modular square root
     val y = ySquared.modPow((p + 1.toBigInteger()) / 4.toBigInteger(), p)
@@ -253,8 +252,8 @@ fun main() {
     }
 
     val point = PointField(x, y)
-    val verify = point.verifyPoint()
-    println(verify)
+    val verifyY = point.verifyPoint()
+    println(verifyY)
 
 
 }

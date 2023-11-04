@@ -121,16 +121,17 @@ object Schnorr {
             return false
         }
 
-        val P = evaluatePoint(pubkey.ByteArrayToBigInteger())
+        val P: PointField = evaluatePoint(pubkey.ByteArrayToBigInteger())
 
-        val pX = P.x
-        val pY = P.y
+        // pX, pY สำหรับ Debug เพื่อดูข้อมูลที่ใช้ในการคำนวณ
+        //val pX: BigInteger = P.x
+        //val pY: BigInteger = P.y
 
-        val buf = r.DeciToHex().HexToByteArray() + pubkey + message
+        val buf: ByteArray = r.DeciToHex().HexToByteArray() + pubkey + message
 
-        val e = hashThis("BIP0340/challenge", buf).ByteArrayToBigInteger() % EllipticCurve.N
+        val e: BigInteger = hashThis("BIP0340/challenge", buf).ByteArrayToBigInteger() % EllipticCurve.N
 
-        val R = EllipticCurve.addPoint(
+        val R: PointField = EllipticCurve.addPoint(
             multiplyPoint(s),
             multiplyPoint(EllipticCurve.N - e, P)
         )

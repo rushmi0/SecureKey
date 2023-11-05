@@ -18,11 +18,9 @@ import java.security.SecureRandom
 
 /*
 * สร้างลายเซ็นและตรวจสอบ Schnorr Signature
-* https://medium.com/bitbees/what-the-heck-is-schnorr-52ef5dba289f
 * https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki#user-content-Public_Key_Generation
 * */
 
-// ! Schnorr Signature ยังใช้ไม่ได้
 
 object Schnorr {
 

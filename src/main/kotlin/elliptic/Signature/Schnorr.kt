@@ -114,9 +114,6 @@ object Schnorr {
 
         val kPrime = rand.ByteArrayToBigInteger() % N
 
-        if (kPrime == BigInteger.ZERO) {
-            sign(privateKey, message)
-        }
 
         val R: PointField = if (multiplyPoint(kPrime).y.hasEvenY()) {
             multiplyPoint(kPrime)

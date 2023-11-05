@@ -73,6 +73,26 @@ object ShiftTo {
     }
 
 
+    fun BigInteger.DeciToBin(): String {
+        var decimalValue = this
+        var binaryResult = ""
+
+        if (decimalValue == BigInteger.ZERO) {
+            return "0"
+        }
+
+        while (decimalValue > BigInteger.ZERO) {
+            val remainder = decimalValue % BigInteger.valueOf(2)
+            binaryResult = remainder.toString() + binaryResult
+            decimalValue /= BigInteger.valueOf(2)
+        }
+
+        return binaryResult
+    }
+
+
+
+
     fun Int.DeciToByte(): ByteArray {
         val bytes = ByteArray(4)
         bytes[0] = (this shr 24 and 0xFF).toByte()
@@ -141,8 +161,15 @@ object ShiftTo {
     }
 
 
-    fun String.HexToByteArray(): ByteArray = ByteArray(this.length / 2) { this.substring(it * 2, it * 2 + 2).toInt(16).toByte() }
-
+    //fun String.HexToByteArray(): ByteArray = ByteArray(this.length / 2) { this.substring(it * 2, it * 2 + 2).toInt(16).toByte() }
+    fun String.HexToByteArray(): ByteArray {
+        val hex = this.replace("", "")
+        val byteArray = ByteArray(hex.length / 2)
+        for (i in byteArray.indices) {
+            byteArray[i] = hex.substring(2 * i, 2 * i + 2).toInt(16).toByte()
+        }
+        return byteArray
+    }
 
     fun String.littleEndianToDeci(): Long {
         var result: Long = 0
@@ -157,6 +184,17 @@ object ShiftTo {
         return result
     }
 
+
+    fun String.splitHexData(): List<String> {
+        val result = mutableListOf<String>()
+
+        for (i in indices step 2) {
+            val hex = this.substring(i, i + 2)
+            result.add(hex)
+        }
+
+        return result
+    }
 
 
     fun String.decodeBase58(): String {

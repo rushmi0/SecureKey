@@ -1,11 +1,13 @@
 package elliptic.example
 
 
+import elliptic.ECPublicKey.toPoint
 import java.math.BigInteger
 import java.security.MessageDigest
 
 import fr.acinq.secp256k1.Secp256k1 // 0.11.0
 import util.ShiftTo.ByteArrayToHex
+import java.security.SecureRandom
 
 fun signSchnorr(
     data: ByteArray,
@@ -28,10 +30,13 @@ fun sha256(data: ByteArray): ByteArray {
 
 fun main() {
 
-    val privateKey = BigInteger("51910214170999450186530030419309914520002218989473598981700580551132384417562")
+    val privateKey = BigInteger(256, SecureRandom())
+    //val privateKey = BigInteger("51910214170999450186530030419309914520002218989473598981700580551132384417562")
     println("Private Key: $privateKey")
 
-    val pubKeyX = BigInteger("54937464590658530654488624268151724241105264383655924818230768164485909069475")
+    //val pubKeyX = BigInteger("54937464590658530654488624268151724241105264383655924818230768164485909069475")
+
+    val pubKeyX = privateKey.toPoint().x
     println("Public Key X: $pubKeyX")
 
     val message = sha256("I am a fish".toByteArray())

@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.9.20"
+    // kotlin("multiplatform") version "1.9.20"
     application
 }
 
@@ -11,8 +12,6 @@ repositories {
 }
 
 dependencies {
-
-    testImplementation(kotlin("test"))
 
     // https://mvnrepository.com/artifact/com.google.guava/guava
     implementation("com.google.guava:guava:32.1.2-jre")
@@ -46,7 +45,12 @@ tasks {
 }
 
 kotlin {
-    jvmToolchain(17)
+
+   sourceSets.all {
+       languageSettings {
+           version = 2.0
+       }
+   }
 }
 
 application {

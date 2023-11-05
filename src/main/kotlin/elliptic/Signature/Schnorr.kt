@@ -145,7 +145,7 @@ object Schnorr {
         val r: BigInteger = R.x
         val s: BigInteger = (kPrime + (e * d)) % N
 
-        val verify = verify(message.DeciToHex().HexToByteArray(), P.x.DeciToHex().HexToByteArray(), Pair(r, s))
+        //val verify = verify(message.DeciToHex().HexToByteArray(), P.x.DeciToHex().HexToByteArray(), Pair(r, s))
 
         return Pair(r, s)
 

@@ -34,8 +34,6 @@ object Schnorr {
     private val B: BigInteger = curveDomain.B
 
 
-
-
     private fun BigInteger.hasEvenY(): Boolean = this.mod(BigInteger.TWO) == BigInteger.ZERO
 
     /**
@@ -70,7 +68,6 @@ object Schnorr {
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
 
 
-
     /**
      * The algorithm Sign(sk, m) is defined as:
      * Let d' = int(sk)
@@ -90,13 +87,25 @@ object Schnorr {
      * */
 
 
+    private fun generateAuxRand(): ByteArray {
+        var auxRand: ByteArray
+
+        do {
+            auxRand = BigInteger(256, SecureRandom()).DeciToHex().HexToByteArray()
+        } while (auxRand.size != 32)
+
+        return auxRand
+    }
+
+
+
     fun sign(
         privateKey: BigInteger,
         message: BigInteger
     ): String {
         require(privateKey < N) { "The private key must be less than the curve order." }
 
-        //val nonce = BigInteger(256, SecureRandom())
+        val auxRand = generateAuxRand()
 
         val P: PointField = multiplyPoint(privateKey)
 
@@ -106,11 +115,16 @@ object Schnorr {
             N - privateKey
         }
 
-        val t: ByteArray = d.DeciToHex().HexToByteArray() + hashTagged("BIP0340/aux", privateKey.DeciToHex().HexToByteArray())
+        val t: ByteArray = d.DeciToHex().HexToByteArray() + hashTagged(
+            "BIP0340/aux",
+            auxRand
+        )
 
-        val set1 = t + P.x.DeciToHex().HexToByteArray() + message.DeciToBin().HexToByteArray()
 
-        val rand: ByteArray = hashTagged("BIP0340/nonce", set1)
+        val rand: ByteArray = hashTagged(
+            "BIP0340/nonce",
+            t + P.x.DeciToHex().HexToByteArray() + message.DeciToHex().HexToByteArray()
+        )
 
         val kPrime = rand.ByteArrayToBigInteger() % N
 
@@ -121,9 +135,11 @@ object Schnorr {
             multiplyPoint(N - kPrime)
         }
 
-        val set2: ByteArray = R.x.DeciToHex().HexToByteArray() + P.x.DeciToHex().HexToByteArray() + message.DeciToBin().HexToByteArray()
 
-        val e: BigInteger = hashTagged("BIP0340/challenge", set2).ByteArrayToBigInteger() % N
+        val e: BigInteger = hashTagged(
+            "BIP0340/challenge",
+            R.x.DeciToHex().HexToByteArray() + P.x.DeciToHex().HexToByteArray() + message.DeciToHex().HexToByteArray()
+        ).ByteArrayToBigInteger() % N
 
         val sig: ByteArray = R.x.DeciToHex().HexToByteArray() + ((kPrime + (e * d)) % N).DeciToHex().HexToByteArray()
 
@@ -173,7 +189,6 @@ object Schnorr {
 
         return R.y.hasEvenY() && R.x == r
     }
-
 
 
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\

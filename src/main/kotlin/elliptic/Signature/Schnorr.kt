@@ -102,7 +102,6 @@ object Schnorr {
         require(privateKey < N) { "The private key must be less than the curve order." }
 
         val auxRand = generateAuxRand()
-        val auxSize = auxRand.size
 
         val P: PointField = multiplyPoint(privateKey)
 

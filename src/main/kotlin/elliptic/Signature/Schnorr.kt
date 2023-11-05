@@ -195,7 +195,7 @@ fun main() {
 
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
 
-    // ! TEST: Schnorr sign [failed]
+    // ! TEST: sign [failed]
 
     val signature: String = Schnorr.sign(privateKey, message.ByteArrayToBigInteger())
     println("Signature size ${signature.HexToByteArray().size} bytes: $signature")
@@ -214,7 +214,7 @@ fun main() {
 
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
 
-    // ! TEST: Schnorr verify [success]
+    // ! TEST: verify [success]
 
 //    val pubkey =
 //        BigInteger("54937464590658530654488624268151724241105264383655924818230768164485909069475").toByteArray()

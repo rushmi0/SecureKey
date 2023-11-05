@@ -102,10 +102,12 @@ object Schnorr {
     fun sign(
         privateKey: BigInteger,
         message: BigInteger
-    ): String {
+    ): Pair<BigInteger, BigInteger> {
         require(privateKey < N) { "The private key must be less than the curve order." }
 
         val auxRand = generateAuxRand()
+
+        val auxSize = auxRand.size
 
         val P: PointField = multiplyPoint(privateKey)
 
@@ -141,9 +143,17 @@ object Schnorr {
             R.x.DeciToHex().HexToByteArray() + P.x.DeciToHex().HexToByteArray() + message.DeciToHex().HexToByteArray()
         ).ByteArrayToBigInteger() % N
 
-        val sig: ByteArray = R.x.DeciToHex().HexToByteArray() + ((kPrime + (e * d)) % N).DeciToHex().HexToByteArray()
 
-        return sig.ByteArrayToHex()
+        val r: BigInteger = R.x
+        val s: BigInteger = (kPrime + (e * d)) % N
+
+        val verify = verify(message.DeciToHex().HexToByteArray(), P.x.DeciToHex().HexToByteArray(), Pair(r, s))
+
+        return if (!verify) {
+            sign(privateKey, message)
+        } else {
+            Pair(r, s)
+        }
 
     }
 
@@ -199,28 +209,24 @@ object Schnorr {
 
 fun main() {
 
-    val privateKey = BigInteger(256, SecureRandom())
-//    val privateKey =
-//        BigInteger("83815085818061553551680724484383113567819967948708730975173007970516951616417")
+    //val privateKey = BigInteger(256, SecureRandom())
 
+    val privateKey =
+        BigInteger("83815085818061553551680724484383113567819967948708730975173007970516951616417")
+
+    println("Private Key hex ${privateKey.DeciToHex().HexToByteArray().size} bytes: ${privateKey.DeciToHex()}")
     val message: ByteArray = "I am a fish".SHA256()
 
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
 
     // ! TEST: sign [failed]
 
-    val signature: String = Schnorr.sign(privateKey, message.ByteArrayToBigInteger())
-    println("Signature size ${signature.HexToByteArray().size} bytes: $signature")
-
     val xValue: ByteArray = privateKey.toPoint().x.DeciToHex().HexToByteArray() // PublicKey x value
 
-    val r: BigInteger = signature.HexToByteArray().copyOfRange(0, 32).ByteArrayToBigInteger()
-    val s: BigInteger = signature.HexToByteArray().copyOfRange(32, 64).ByteArrayToBigInteger()
+    val signature = Schnorr.sign(privateKey, message.ByteArrayToBigInteger())
+    println("signature: \n s : ${signature.first.DeciToHex()} ${signature.first.DeciToHex().HexToByteArray().size} Bytes \n r : ${signature.second.DeciToHex()} ${signature.second.DeciToHex().HexToByteArray().size} Bytes")
 
-    println("r: ${r.DeciToHex().HexToByteArray().size} ${r.DeciToHex()}")
-    println("s: ${s.DeciToHex().HexToByteArray().size} ${s.DeciToHex()}")
-
-    val verify: Boolean = Schnorr.verify(message, xValue, Pair(r, s))
+    val verify: Boolean = Schnorr.verify(message, xValue, signature)
     println("verify: $verify")
 
 

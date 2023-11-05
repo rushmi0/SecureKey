@@ -139,12 +139,6 @@ object Schnorr {
 
 
     /**
-     * `Verification`
-     * Input:
-     *  The public key pk: a 32-byte array
-     *  The message m: a byte array
-     * A signature sig: a 64-byte array
-     *
      * The algorithm Verify(pk, m, sig) is defined as:
      *  Let P = lift_x(int(pk)); fail if that fails.
      *  Let r = int(sig[0:32]); fail if r ≥ p.
@@ -154,8 +148,6 @@ object Schnorr {
      *  Fail if is_infinite(R).
      *  Fail if not has_even_y(R).
      *  Fail if x(R) ≠ r.
-     *
-     *  Return success iff no failure occurred before reaching this point.
      * */
 
 

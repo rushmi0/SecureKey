@@ -6,7 +6,6 @@ import elliptic.EllipticCurve
 import elliptic.EllipticCurve.multiplyPoint
 import elliptic.PointField
 import elliptic.Secp256K1
-import elliptic.example.sha256
 import util.Hashing.SHA256
 import util.ShiftTo.ByteArrayToBigInteger
 import util.ShiftTo.ByteArrayToHex
@@ -60,7 +59,7 @@ object Schnorr {
         )
     }
 
-    private fun hashThis(tag: String, data: ByteArray): ByteArray {
+    private fun hashTagged(tag: String, data: ByteArray): ByteArray {
         val tagBytes: ByteArray = tag.SHA256()
 
         val com = tagBytes.copyOfRange(0, tagBytes.size) + tagBytes.copyOfRange(0, tagBytes.size) + data
@@ -68,13 +67,11 @@ object Schnorr {
     }
 
 
+    // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
+
+
+
     /**
-     * Default Signing
-     * Input:
-     *
-     * The secret key sk: a 32-byte array
-     * The message m: a byte array
-     * Auxiliary random data a: a 32-byte array
      * The algorithm Sign(sk, m) is defined as:
      * Let d' = int(sk)
      * Fail if d' = 0 or d' ≥ n
@@ -109,11 +106,11 @@ object Schnorr {
             N - privateKey
         }
 
-        val t: ByteArray = d.DeciToHex().HexToByteArray() + hashThis("BIP0340/aux", privateKey.DeciToHex().HexToByteArray())
+        val t: ByteArray = d.DeciToHex().HexToByteArray() + hashTagged("BIP0340/aux", privateKey.DeciToHex().HexToByteArray())
 
-        val buf1 = t + P.x.DeciToHex().HexToByteArray() + message.DeciToBin().HexToByteArray()
+        val set1 = t + P.x.DeciToHex().HexToByteArray() + message.DeciToBin().HexToByteArray()
 
-        val rand: ByteArray = hashThis("BIP0340/nonce", buf1)
+        val rand: ByteArray = hashTagged("BIP0340/nonce", set1)
 
         val kPrime = rand.ByteArrayToBigInteger() % N
 
@@ -127,13 +124,14 @@ object Schnorr {
             multiplyPoint(N - kPrime)
         }
 
-        val buf2: ByteArray = R.x.DeciToHex().HexToByteArray() + P.x.DeciToHex().HexToByteArray() + message.DeciToBin().HexToByteArray()
+        val set2: ByteArray = R.x.DeciToHex().HexToByteArray() + P.x.DeciToHex().HexToByteArray() + message.DeciToBin().HexToByteArray()
 
-        val e: BigInteger = hashThis("BIP0340/challenge", buf2).ByteArrayToBigInteger() % N
+        val e: BigInteger = hashTagged("BIP0340/challenge", set2).ByteArrayToBigInteger() % N
 
         val sig: ByteArray = R.x.DeciToHex().HexToByteArray() + ((kPrime + (e * d)) % N).DeciToHex().HexToByteArray()
 
         return sig.ByteArrayToHex()
+
     }
 
 
@@ -141,7 +139,6 @@ object Schnorr {
 
 
     /**
-     *
      * `Verification`
      * Input:
      *  The public key pk: a 32-byte array
@@ -159,9 +156,7 @@ object Schnorr {
      *  Fail if x(R) ≠ r.
      *
      *  Return success iff no failure occurred before reaching this point.
-     *
      * */
-
 
 
     fun verify(
@@ -180,7 +175,7 @@ object Schnorr {
 
         val buf: ByteArray = r.DeciToHex().HexToByteArray() + pubkey + message
 
-        val e: BigInteger = hashThis("BIP0340/challenge", buf).ByteArrayToBigInteger() % N
+        val e: BigInteger = hashTagged("BIP0340/challenge", buf).ByteArrayToBigInteger() % N
 
         val R: PointField = EllipticCurve.addPoint(
             multiplyPoint(s),
@@ -197,6 +192,7 @@ object Schnorr {
 
 }
 
+
 fun main() {
 
     val privateKey = BigInteger(256, SecureRandom())
@@ -204,21 +200,21 @@ fun main() {
 //        BigInteger("83815085818061553551680724484383113567819967948708730975173007970516951616417")
 
 
+    val message: ByteArray = "I am a fish".SHA256()
 
-    val message = "I am a fish".SHA256()
 
-
-    val signature = Schnorr.sign(privateKey, message.ByteArrayToBigInteger())
+    val signature: String = Schnorr.sign(privateKey, message.ByteArrayToBigInteger())
     println("Signature size ${signature.HexToByteArray().size} bytes: $signature")
 
-    val xValue = privateKey.toPoint().x.DeciToHex().HexToByteArray()
+    val xValue: ByteArray = privateKey.toPoint().x.DeciToHex().HexToByteArray() // PublicKey x value
 
     val r: BigInteger = signature.HexToByteArray().copyOfRange(0, 32).ByteArrayToBigInteger()
     val s: BigInteger = signature.HexToByteArray().copyOfRange(32, 64).ByteArrayToBigInteger()
 
     println("r: ${r.DeciToHex().HexToByteArray().size} ${r.DeciToHex()}")
     println("s: ${s.DeciToHex().HexToByteArray().size} ${s.DeciToHex()}")
-    val verify = Schnorr.verify(message, xValue, Pair(r, s))
+
+    val verify: Boolean = Schnorr.verify(message, xValue, Pair(r, s))
     println("verify: $verify")
 
 

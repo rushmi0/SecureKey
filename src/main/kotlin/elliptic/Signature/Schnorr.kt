@@ -191,9 +191,11 @@ fun main() {
 //    val privateKey =
 //        BigInteger("83815085818061553551680724484383113567819967948708730975173007970516951616417")
 
-
     val message: ByteArray = "I am a fish".SHA256()
 
+    // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
+
+    // ! TEST: Schnorr sign [failed]
 
     val signature: String = Schnorr.sign(privateKey, message.ByteArrayToBigInteger())
     println("Signature size ${signature.HexToByteArray().size} bytes: $signature")
@@ -210,6 +212,10 @@ fun main() {
     println("verify: $verify")
 
 
+    // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
+
+    // ! TEST: Schnorr verify [success]
+
 //    val pubkey =
 //        BigInteger("54937464590658530654488624268151724241105264383655924818230768164485909069475").toByteArray()
 //    val sig = "a538dd030d1985afede868e1a885bb8153d1c70c8dd6800ac0fd47a0a0c9471f0ee8ed2ae8af02f8167c4e3b4d601a6d5bd60a91ba31f6f5b48ccad1385574d0".HexToByteArray()
@@ -219,7 +225,7 @@ fun main() {
 //    val r: BigInteger = sig.copyOfRange(0, 32).ByteArrayToBigInteger()
 //    val s: BigInteger = sig.copyOfRange(32, 64).ByteArrayToBigInteger()
 //
-//    val verify = verifySchnorr(message, pubkey, Pair(r, s))
+//    val verify = Schnorr.verify(message, pubkey, Pair(r, s))
 //    println("verify: $verify")
 
 }

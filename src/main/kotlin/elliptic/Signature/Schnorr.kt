@@ -86,15 +86,13 @@ object Schnorr {
 
 
     private fun generateAuxRand(): ByteArray {
-        var auxRand: ByteArray
-
-        do {
-            auxRand = BigInteger(256, SecureRandom()).DeciToHex().HexToByteArray()
-        } while (auxRand.size != 32)
-
-        return auxRand
+        while (true) {
+            val auxRand = BigInteger(256, SecureRandom()).DeciToHex().HexToByteArray()
+            if (auxRand.size == 32) {
+                return auxRand
+            }
+        }
     }
-
 
 
     fun sign(
@@ -104,7 +102,6 @@ object Schnorr {
         require(privateKey < N) { "The private key must be less than the curve order." }
 
         val auxRand = generateAuxRand()
-
         val auxSize = auxRand.size
 
         val P: PointField = multiplyPoint(privateKey)
@@ -127,6 +124,9 @@ object Schnorr {
         )
 
         val kPrime = rand.ByteArrayToBigInteger() % N
+        if (kPrime == BigInteger.ZERO) {
+            throw RuntimeException("Failure. This happens only with negligible probability.")
+        }
 
 
         val R: PointField = if (multiplyPoint(kPrime).y.hasEvenY()) {
@@ -147,11 +147,7 @@ object Schnorr {
 
         val verify = verify(message.DeciToHex().HexToByteArray(), P.x.DeciToHex().HexToByteArray(), Pair(r, s))
 
-        return if (!verify) {
-            sign(privateKey, message)
-        } else {
-            Pair(r, s)
-        }
+        return Pair(r, s)
 
     }
 
@@ -207,41 +203,30 @@ object Schnorr {
 
 fun main() {
 
-    //val privateKey = BigInteger(256, SecureRandom())
+    var num = 1
+    while (true) {
+        //val privateKey = BigInteger(256, SecureRandom())
 
-    val privateKey =
-        BigInteger("83815085818061553551680724484383113567819967948708730975173007970516951616417")
+        val privateKey = BigInteger("83815085818061553551680724484383113567819967948708730975173007970516951616417")
 
-    println("Private Key hex ${privateKey.DeciToHex().HexToByteArray().size} bytes: ${privateKey.DeciToHex()}")
-    val message: ByteArray = "I am a fish".SHA256()
+        val message: ByteArray = "I am a fish".SHA256()
 
-    // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
+        val xValue: ByteArray = privateKey.toPoint().x.DeciToHex().HexToByteArray() // PublicKey x value
 
-    // ! TEST: sign [failed]
+        val signature = Schnorr.sign(privateKey, message.ByteArrayToBigInteger())
 
-    val xValue: ByteArray = privateKey.toPoint().x.DeciToHex().HexToByteArray() // PublicKey x value
+        val verify: Boolean = Schnorr.verify(message, xValue, signature)
 
-    val signature = Schnorr.sign(privateKey, message.ByteArrayToBigInteger())
-    println("signature: \n s : ${signature.first.DeciToHex()} ${signature.first.DeciToHex().HexToByteArray().size} Bytes \n r : ${signature.second.DeciToHex()} ${signature.second.DeciToHex().HexToByteArray().size} Bytes")
+        num++
+        if (!verify) {
+            println("\nCount: $num")
+            println("Private Key hex ${privateKey.DeciToHex().HexToByteArray().size} bytes: ${privateKey.DeciToHex()}")
+            println("signature: \n s : ${signature.first.DeciToHex()} ${signature.first.DeciToHex().HexToByteArray().size} Bytes \n r : ${signature.second.DeciToHex()} ${signature.second.DeciToHex().HexToByteArray().size} Bytes")
+            println("verify: $verify")
+            break
+        }
 
-    val verify: Boolean = Schnorr.verify(message, xValue, signature)
-    println("verify: $verify")
+    }
 
-
-    // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
-
-    // ! TEST: verify [success]
-
-//    val pubkey =
-//        BigInteger("54937464590658530654488624268151724241105264383655924818230768164485909069475").toByteArray()
-//    val sig = "a538dd030d1985afede868e1a885bb8153d1c70c8dd6800ac0fd47a0a0c9471f0ee8ed2ae8af02f8167c4e3b4d601a6d5bd60a91ba31f6f5b48ccad1385574d0".HexToByteArray()
-//    val data = "a538dd030d1985afede868e1a885bb8153d1c70c8dd6800ac0fd47a0a0c9471f0ee8ed2ae8af02f8167c4e3b4d601a6d5bd60a91ba31f6f5b48ccad1385574d0"
-//    println("sig: ${data.length}")
-//
-//    val r: BigInteger = sig.copyOfRange(0, 32).ByteArrayToBigInteger()
-//    val s: BigInteger = sig.copyOfRange(32, 64).ByteArrayToBigInteger()
-//
-//    val verify = Schnorr.verify(message, pubkey, Pair(r, s))
-//    println("verify: $verify")
 
 }

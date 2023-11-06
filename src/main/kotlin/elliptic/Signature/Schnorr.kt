@@ -35,7 +35,7 @@ object Schnorr {
     private fun BigInteger.hasEvenY(): Boolean = this.mod(BigInteger.TWO) == BigInteger.ZERO
 
     /**
-     * lift_x(x) is equivalent to the following pseudocode:
+     * < pseudocode >
      *  Fail if x ≥ p.
      *  Let c = x3 + 7 mod p.
      *  Let y = c(p+1)/4 mod p.
@@ -67,6 +67,7 @@ object Schnorr {
 
 
     /**
+     * < pseudocode >
      * The algorithm Sign(sk, m) is defined as:
      * Let d' = int(sk)
      * Fail if d' = 0 or d' ≥ n
@@ -87,7 +88,7 @@ object Schnorr {
 
     private fun generateAuxRand(): ByteArray {
         while (true) {
-            val auxRand = BigInteger(256, SecureRandom()).DeciToHex().HexToByteArray()
+            val auxRand = BigInteger(256, SecureRandom()).toByteArray()
             if (auxRand.size == 32) {
                 return auxRand
             }
@@ -111,15 +112,14 @@ object Schnorr {
             N - privateKey
         }
 
-        val t: ByteArray = d.DeciToHex().HexToByteArray() + hashTagged(
+        val t: ByteArray = d.toByteArray() + hashTagged(
             "BIP0340/aux",
             auxRand
         )
-
-
+        
         val rand: ByteArray = hashTagged(
             "BIP0340/nonce",
-            t + P.x.DeciToHex().HexToByteArray() + message.DeciToHex().HexToByteArray()
+            t + P.x.toByteArray() + message.toByteArray()
         )
 
         val kPrime = rand.ByteArrayToBigInteger() % N
@@ -137,7 +137,7 @@ object Schnorr {
 
         val e: BigInteger = hashTagged(
             "BIP0340/challenge",
-            R.x.DeciToHex().HexToByteArray() + P.x.DeciToHex().HexToByteArray() + message.DeciToHex().HexToByteArray()
+            R.x.toByteArray() + P.x.toByteArray() + message.toByteArray()
         ).ByteArrayToBigInteger() % N
 
 
@@ -154,6 +154,7 @@ object Schnorr {
 
 
     /**
+     * < pseudocode >
      * The algorithm Verify(pk, m, sig) is defined as:
      *  Let P = lift_x(int(pk)); fail if that fails.
      *  Let r = int(sig[0:32]); fail if r ≥ p.
@@ -180,7 +181,7 @@ object Schnorr {
 
         val P: PointField = evaluatePoint(pubkey.ByteArrayToBigInteger())
 
-        val buf: ByteArray = r.DeciToHex().HexToByteArray() + pubkey + message
+        val buf: ByteArray = r.toByteArray() + pubkey + message
 
         val e: BigInteger = hashTagged("BIP0340/challenge", buf).ByteArrayToBigInteger() % N
 
@@ -209,7 +210,7 @@ fun main() {
 
         val message: ByteArray = "I am a fish".SHA256()
 
-        val xValue: ByteArray = privateKey.toPoint().x.DeciToHex().HexToByteArray() // PublicKey x value
+        val xValue: ByteArray = privateKey.toPoint().x.toByteArray() // PublicKey x value
 
         val signature = Schnorr.sign(privateKey, message.ByteArrayToBigInteger())
 
@@ -218,8 +219,8 @@ fun main() {
         num++
         if (!verify) {
             println("\nCount: $num")
-            println("Private Key hex ${privateKey.DeciToHex().HexToByteArray().size} bytes: ${privateKey.DeciToHex()}")
-            println("signature: \n s : ${signature.first.DeciToHex()} ${signature.first.DeciToHex().HexToByteArray().size} Bytes \n r : ${signature.second.DeciToHex()} ${signature.second.DeciToHex().HexToByteArray().size} Bytes")
+            println("Private Key hex ${privateKey.toByteArray().size} bytes: ${privateKey.DeciToHex()}")
+            println("signature: \n s : ${signature.first.DeciToHex()} ${signature.first.toByteArray().size} Bytes \n r : ${signature.second.DeciToHex()} ${signature.second.toByteArray().size} Bytes")
             println("verify: $verify")
             break
         } else {

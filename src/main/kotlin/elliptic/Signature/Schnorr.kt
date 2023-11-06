@@ -51,7 +51,7 @@ object Schnorr {
 
         return PointField(
             pubkey,
-            if (y.mod(BigInteger.TWO) == BigInteger.ZERO) y else P - y
+            if (y.hasEvenY()) y else P - y
         )
     }
 
@@ -144,7 +144,6 @@ object Schnorr {
         val r: BigInteger = R.x
         val s: BigInteger = (kPrime + (e * d)) % N
 
-        //val verify = verify(message.DeciToHex().HexToByteArray(), P.x.DeciToHex().HexToByteArray(), Pair(r, s))
 
         return Pair(r, s)
 
@@ -223,6 +222,8 @@ fun main() {
             println("signature: \n s : ${signature.first.DeciToHex()} ${signature.first.DeciToHex().HexToByteArray().size} Bytes \n r : ${signature.second.DeciToHex()} ${signature.second.DeciToHex().HexToByteArray().size} Bytes")
             println("verify: $verify")
             break
+        } else {
+            println("pass $verify : $num")
         }
 
     }

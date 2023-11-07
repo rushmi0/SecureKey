@@ -1,8 +1,6 @@
 package elliptic
 
-import elliptic.ECPublicKey.compressed
-import elliptic.ECPublicKey.keyRecovery
-import elliptic.ECPublicKey.toPublicKey
+
 import elliptic.ECPublicKey.verifyPoint
 import elliptic.EllipticCurve.P
 import elliptic.EllipticCurve.A
@@ -14,11 +12,6 @@ import util.ShiftTo.ByteArrayToHex
 import util.ShiftTo.HexToByteArray
 
 import java.math.BigInteger
-import java.security.SecureRandom
-
-import fr.acinq.secp256k1.Secp256k1.Companion.signSchnorr
-import fr.acinq.secp256k1.Secp256k1.Companion.verifySchnorr
-import java.security.MessageDigest
 
 object ECPublicKey {
 
@@ -32,7 +25,7 @@ object ECPublicKey {
     * `isPointOnCurve` Method นี้ใช้เพื่อตรวจสอบว่าจุดที่รับเข้ามานั้นอยู่บนเส้นโค้งวงรีหรือไม่
     * โดยการรับค่า point เพื่อนำไปคำนวณตามสมการเส้นโค้งวงรี และตรวจสอบว่าสมการที่ได้มีค่าเท่ากันหรือไม่ และจะคืนค่าเป็น true หากสมการมีค่าเท่ากัน
     * */
-    private fun isPointOnCurve(point: PointField?): Boolean {
+    fun isPointOnCurve(point: PointField?): Boolean {
         val (x, y) = point
         // ! ถ้าค่า point ที่รับเข้ามาเป็น null ให้ส่งค่า Exception กลับไป
             ?: throw IllegalArgumentException("`isPointOnCurve` Method Point is null")
@@ -46,6 +39,71 @@ object ECPublicKey {
 
 
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
+
+
+    // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
+
+
+    // * https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki
+    // เมธอดสำหรับแปลงลายเซ็นให้อยู่ในรูปของ DER format
+    // โดยรับคู่ของ BigInteger ที่แทนลายเซ็น (r, s) เป็น input
+    fun toDERencode(signature: Pair<BigInteger, BigInteger>): String {
+        // แยกค่า r และ s จากคู่ของ BigInteger
+        val (r, s) = signature
+
+        // แปลงค่า r และ s ให้อยู่ในรูปของ bytes
+        val rb = r.toByteArray()
+        val sb = s.toByteArray()
+
+        // สร้าง bytes สำหรับเก็บค่า r ในรูปแบบ DER
+        val der_r = byteArrayOf(0x02.toByte()) + rb.size.toByte() + rb
+
+        // สร้าง bytes สำหรับเก็บค่า s ในรูปแบบ DER
+        val der_s = byteArrayOf(0x02.toByte()) + sb.size.toByte() + sb
+
+        // สร้าง bytes สำหรับเก็บลายเซ็นในรูปแบบ DER ที่รวมค่า r และ s
+        val der_sig = byteArrayOf(0x30.toByte()) + (der_r.size + der_s.size).toByte() + der_r + der_s
+
+        // แปลง bytes ในรูปของ DER ให้อยู่ในรูปของ hexadecimal string
+        return der_sig.joinToString("") { "%02x".format(it) }
+    }
+
+
+
+    // เมธอดสำหรับถอดรหัสลายเซ็นในรูปของ DER
+    // และคืนค่าเป็นคู่ของ BigInteger (r, s)
+    fun derRecovered(derSignature: String): Pair<BigInteger, BigInteger>? {
+        try {
+            // แปลงรหัสลายเซ็นในรูปของ DER จากฐาน 16 เป็น bytes
+            val derBytes = derSignature.chunked(2).map { it.toInt(16).toByte() }.toByteArray()
+
+            // ตรวจสอบความถูกต้องของรูปแบบ DER
+            if (derBytes.size < 8 || derBytes[0] != 0x30.toByte() || derBytes[2] != 0x02.toByte()) {
+                return null
+            }
+
+            // คำนวณความยาวของ r และ s
+            val lenR = derBytes[3].toInt()
+            val lenS = derBytes[lenR + 5].toInt()
+
+            // ดึง bytes ที่เกี่ยวข้องกับ r และ s
+            val rBytes = derBytes.copyOfRange(4, 4 + lenR)
+            val sBytes = derBytes.copyOfRange(6 + lenR, 6 + lenR + lenS)
+
+            // แปลง bytes เป็น BigInteger โดยไม่เอาเครื่องหมายลบ (positive)
+            val r = BigInteger(1, rBytes)
+            val s = BigInteger(1, sBytes)
+
+            return Pair(r, s)
+        } catch (e: Exception) {
+            println("ไม่สามารถถอดรหัสลายเซ็น: ${e.message}")
+            return null
+        }
+    }
+
+
+    // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
+
 
     // รับค่า private key และคืนค่า public key ในรูปแบบพิกัดบนเส้นโค้งวงรี พิกัด x และ y จะเป็นค่า BigInteger เลขฐาน 10
     private fun generatePoint(k: BigInteger): PointField {
@@ -65,7 +123,6 @@ object ECPublicKey {
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
 
 
-
     private fun fullPublicKeyPoint(k: BigInteger): String {
         try {
             val point: PointField = multiplyPoint(k)
@@ -78,22 +135,15 @@ object ECPublicKey {
             val max = maxOf(xSize, ySize)
 
             when {
-
                 xSize != max -> {
-
                     val padding: String = "0".repeat(max - xSize)
-
                     return "04$padding$xHex$yHex"
                 }
-
                 ySize != max -> {
-
                     val padding: String = "0".repeat(max - ySize)
-
                     return "04$xHex$padding$yHex"
                 }
             }
-
             return "04$xHex$yHex"
         } catch (e: IllegalArgumentException) {
             println("Invalid private key: ${e.message}")
@@ -106,7 +156,6 @@ object ECPublicKey {
 
 
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
-
 
 
     private fun groupSelection(publicKey: String): String {
@@ -139,74 +188,93 @@ object ECPublicKey {
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
 
 
-    private fun decompressPublicKeyGroup(xGroupOnly: String): PointField? {
-        try {
+    /**
+     * < pseudocode >
+     *  Fail if x ≥ p.
+     *  Let c = x3 + 7 mod p.
+     *  Let y = c(p+1)/4 mod p.
+     *  Fail if c ≠ y2 mod p.
+     * Return the unique point P such that x(P) = x and y(P) = y if y mod 2 = 0 or y(P) = p-y otherwise.
+     * */
+    fun BigInteger.evaluatePoint(): PointField {
+        require(this < P) { "The public key must be less than the field size." }
 
-            // แปลง compressed public key ในรูปแบบ Hex เป็น ByteArray
-            val xOnlyByteArray: ByteArray = xGroupOnly.HexToByteArray()
+        val c = (this.pow(3) + B) % P
 
-            // ดึงค่า x coordinate จาก ByteArray
-            val xCoord: BigInteger = xOnlyByteArray.copyOfRange(1, xOnlyByteArray.size).ByteArrayToBigInteger()
+        val y = c.modPow((P + 1.toBigInteger()) / 4.toBigInteger(), P)
 
-            val xSize = xOnlyByteArray.copyOfRange(1, xOnlyByteArray.size).size
-
-            when {
-
-                xOnlyByteArray.size -1 == xSize && (xOnlyByteArray[0] == 2.toByte() || xOnlyByteArray[0] == 3.toByte()) -> {
-
-                    // ตรวจสอบว่า y เป็นเลขคู่หรือไม่
-                    val isYEven: Boolean = xOnlyByteArray[0] == 2.toByte()
-
-                    // คำนวณค่า x^3 (mod P)
-                    val xCubed: BigInteger = xCoord.modPow(BigInteger.valueOf(3), P)
-
-                    // คำนวณ Ax (mod P)
-                    val Ax: BigInteger = xCoord.multiply(A) % P
-
-                    // คำนวณ y^2 = x^3 + Ax + B (mod P)
-                    val ySquared: BigInteger = xCubed.add(Ax).add(B) % P
-
-                    // คำนวณค่า y จาก y^2 โดยใช้ square root
-                    val y: BigInteger = ySquared.modPow(
-                        P.add(BigInteger.ONE).divide(BigInteger.valueOf(4)),  // (P + 1) / 4
-                        P // mod P
-                    )
-
-                    // ตรวจสอบว่า y^2 เป็นเลขคู่หรือไม่
-                    val isYSquareEven: Boolean = y.mod(BigInteger("2")) == BigInteger.ZERO
-
-                    // คำนวณค่า y โดยแก้ไขเครื่องหมายตามผลลัพธ์ที่ได้จากการตรวจสอบ
-                    val computedY: BigInteger = if (isYSquareEven != isYEven) P.subtract(y) else y
-
-                    // สร้าง PointField จาก x และ y ที่ได้
-                    return PointField(xCoord, computedY)
-                }
-                
-                
-            }
-
-
-
-        } catch (e: IllegalArgumentException) {
-            println("Invalid public key: ${e.message}")
-            return null
-        } catch (e: Exception) {
-            println("Failed to decompress the public key: ${e.message}")
-            return null
+        return if (y.modPow(2.toBigInteger(), P) == c) {
+            PointField(this, y)
+        } else {
+            PointField(this, P - y)
         }
-
-        return null
     }
+
+
+    private fun publicKeyGroup(xGroupOnly: String): PointField {
+
+        val byteArray = xGroupOnly.HexToByteArray()
+        val xCoord = byteArray.copyOfRange(1, byteArray.size).ByteArrayToBigInteger()
+        val isYEven = byteArray[0] == 2.toByte()
+
+        val xCubed = xCoord.modPow(BigInteger.valueOf(3), P)
+        val Ax = xCoord.multiply(A).mod(P)
+        val ySquared = xCubed.add(Ax).add(B).mod(P)
+
+        val y = ySquared.modPow(P.add(BigInteger.ONE).divide(BigInteger.valueOf(4)), P)
+        val isYSquareEven = y.mod(BigInteger.TWO) == BigInteger.ZERO
+        val computedY = if (isYSquareEven != isYEven) P.subtract(y) else y
+
+        return PointField(xCoord, computedY)
+    }
+
+    /*
+    private fun publicKeyGroup(xGroupOnly: String): PointField? {
+        val xOnlyByteArray: ByteArray = xGroupOnly.HexToByteArray()
+        val xCoord: BigInteger = xOnlyByteArray.copyOfRange(1, xOnlyByteArray.size).ByteArrayToBigInteger()
+        val dataSize = xOnlyByteArray.size
+        return when (dataSize) {
+            33 -> {
+
+                xCoord.evaluatePoint()
+            }
+            32 -> {
+                BigInteger(xGroupOnly, 16).evaluatePoint()
+            }
+            else -> {
+                null
+            }
+        }
+    }
+     */
 
 
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
 
-    // Extension Function
-
 
     // `keyRecovery` ใช้สำหรับแปรง Public Key Hex ให้อยู่ในรูปแบบของ พิกัดบนเส้นโค้งวงรี (x, y)
-    fun String.keyRecovery(): PointField? {
-        return decompressPublicKeyGroup(this)
+    fun String.pointRecovery(): PointField {
+
+        //val record = this.HexToByteArray().size
+
+        //val receive = this.HexToByteArray()
+
+        return when (this.HexToByteArray().size) {
+            33 -> {
+                val receive: ByteArray = this.HexToByteArray().copyOfRange(1, this.HexToByteArray().size)
+                BigInteger(receive.ByteArrayToHex(), 16).evaluatePoint()
+            }
+
+            32 -> {
+                BigInteger(this, 16).evaluatePoint()
+            }
+
+            else -> {
+                // แจ้งข้อผิดพลาดเมื่อขนาดของ public key ไม่ถูกต้อง
+                throw IllegalArgumentException("Invalid public key")
+            }
+        }
+
     }
 
 
@@ -231,7 +299,7 @@ object ECPublicKey {
 
 }
 
-
+/*
 fun main() {
 
 
@@ -256,4 +324,4 @@ fun main() {
     println(verifyY)
 
 
-}
+}*/

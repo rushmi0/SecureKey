@@ -21,6 +21,7 @@ dependencies {
     // https://mvnrepository.com/artifact/fr.acinq.secp256k1/secp256k1-kmp-jni-jvm
     runtimeOnly("fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:0.11.0")
 
+    testImplementation("org.junit.platform:junit-platform-console-standalone:1.9.2")
 
 }
 

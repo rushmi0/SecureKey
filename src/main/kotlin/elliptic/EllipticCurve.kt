@@ -7,6 +7,7 @@ import java.math.BigInteger
 * อ้างอิงจาก
 * https://github.com/wobine/blackboard101/blob/master/EllipticCurvesPart5-TheMagic-SigningAndVerifying.py
 * https://cryptobook.nakov.com/asymmetric-key-ciphers/elliptic-curve-cryptography-ecc
+* https://learnmeabitcoin.com/technical/ecdsa
 *
 * < Elliptic Curve Cryptography >
 * */
@@ -61,6 +62,9 @@ object EllipticCurve {
     }
 
 
+    // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
+
+
     fun addPoint(
         point1: PointField,
         point2: PointField
@@ -89,10 +93,9 @@ object EllipticCurve {
     }
 
 
-    /**
-     * `multiplyPoint` Method ใช้สำหรับคำนวณค่าจุดหลังการคูณด้วยจำนวนเต็มบนเส้นโค้งวงรี
-     * หรือก็คือเป็นการสร้าง Public Key จาก Private Key
-     * */
+    // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
+
+
     fun multiplyPoint(
         k: BigInteger,
         point: PointField? = null
@@ -129,7 +132,6 @@ object EllipticCurve {
 
 
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
-
 
 
 }

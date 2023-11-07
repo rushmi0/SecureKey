@@ -1,17 +1,16 @@
 package elliptic.Signature
 
 
-import elliptic.ECPublicKey.toPoint
+
+import elliptic.ECPublicKey.evaluatePoint
+import elliptic.ECPublicKey.pointRecovery
 import elliptic.EllipticCurve
 import elliptic.EllipticCurve.multiplyPoint
 import elliptic.PointField
 import elliptic.Secp256K1
 import util.Hashing.SHA256
 import util.ShiftTo.ByteArrayToBigInteger
-import util.ShiftTo.ByteArrayToHex
-import util.ShiftTo.DeciToBin
 import util.ShiftTo.DeciToHex
-import util.ShiftTo.HexToByteArray
 import java.math.BigInteger
 import java.security.SecureRandom
 
@@ -32,31 +31,11 @@ object Schnorr {
     private val B: BigInteger = curveDomain.B
 
 
-    private fun BigInteger.hasEvenY(): Boolean = this.mod(BigInteger.TWO) == BigInteger.ZERO
+    fun BigInteger.hasEvenY(): Boolean = this.mod(BigInteger.TWO) == BigInteger.ZERO
 
-    /**
-     * < pseudocode >
-     *  Fail if x ≥ p.
-     *  Let c = x3 + 7 mod p.
-     *  Let y = c(p+1)/4 mod p.
-     *  Fail if c ≠ y2 mod p.
-     * Return the unique point P such that x(P) = x and y(P) = y if y mod 2 = 0 or y(P) = p-y otherwise.
-     * */
-    private fun evaluatePoint(pubkey: BigInteger): PointField {
-        require(pubkey < P) { "The public key must be less than the field size." }
 
-        val c = (pubkey.pow(3) + B) % P
-
-        val y = c.modPow((P + 1.toBigInteger()) / 4.toBigInteger(), P)
-
-        return PointField(
-            pubkey,
-            if (y.hasEvenY()) y else P - y
-        )
-    }
-
-    private fun hashTagged(tag: String, data: ByteArray): ByteArray {
-        val tagBytes: ByteArray = tag.SHA256()
+    private fun hashTagged(data: ByteArray, tag: String? = null): ByteArray {
+        val tagBytes: ByteArray = tag?.SHA256() ?: ByteArray(0)
 
         val com = tagBytes.copyOfRange(0, tagBytes.size) + tagBytes.copyOfRange(0, tagBytes.size) + data
         return com.SHA256()
@@ -96,11 +75,28 @@ object Schnorr {
     }
 
 
+    private fun signWithRetry(
+        privateKey: BigInteger,
+        message: BigInteger,
+    ): Pair<BigInteger, BigInteger> {
+        var maxRetries = 20
+        while (maxRetries > 0) {
+            try {
+                return sign(privateKey, message)
+            } catch (e: Exception) {
+                maxRetries--
+            }
+        }
+        throw RuntimeException("Failure. This happens only with negligible probability.")
+    }
+
+
     fun sign(
         privateKey: BigInteger,
-        message: BigInteger
+        message: BigInteger,
     ): Pair<BigInteger, BigInteger> {
         require(privateKey < N) { "The private key must be less than the curve order." }
+        //require(maxRetries > 20) { "Max retries should be greater than 20." }
 
         val auxRand = generateAuxRand()
 
@@ -113,13 +109,13 @@ object Schnorr {
         }
 
         val t: ByteArray = d.toByteArray() + hashTagged(
-            "BIP0340/aux",
-            auxRand
+            auxRand,
+            "BIP0340/aux"
         )
         
         val rand: ByteArray = hashTagged(
-            "BIP0340/nonce",
-            t + P.x.toByteArray() + message.toByteArray()
+            t + P.x.toByteArray() + message.toByteArray(),
+            "BIP0340/nonce"
         )
 
         val kPrime = rand.ByteArrayToBigInteger() % N
@@ -136,14 +132,24 @@ object Schnorr {
 
 
         val e: BigInteger = hashTagged(
-            "BIP0340/challenge",
-            R.x.toByteArray() + P.x.toByteArray() + message.toByteArray()
+            R.x.toByteArray() + P.x.toByteArray() + message.toByteArray(),
+            "BIP0340/challenge"
         ).ByteArrayToBigInteger() % N
 
 
         val r: BigInteger = R.x
         val s: BigInteger = (kPrime + (e * d)) % N
 
+        val verify: Boolean = verify(
+            P.x.DeciToHex(), // ข้อความที่จะเซ็น
+            message.toByteArray(), // ค่า x จาก public key
+            Pair(r, s) // ลายเซ็น
+        )
+
+//        if (!verify) {
+//            // เริ่มสร้างลายเซ็นใหม่เมื่อการตรวจสอบไม่ผ่าน
+//            return signWithRetry(privateKey, message)
+//        }
 
         return Pair(r, s)
 
@@ -168,22 +174,22 @@ object Schnorr {
 
 
     fun verify(
+        pubkey: String,
         message: ByteArray,
-        pubkey: ByteArray,
         signature: Pair<BigInteger, BigInteger>
     ): Boolean {
-
         val (r, s) = signature
 
         if (r >= P || s >= N) {
             return false
         }
 
-        val P: PointField = evaluatePoint(pubkey.ByteArrayToBigInteger())
+        val P: PointField = pubkey.pointRecovery() ?: return false
 
-        val buf: ByteArray = r.toByteArray() + pubkey + message
-
-        val e: BigInteger = hashTagged("BIP0340/challenge", buf).ByteArrayToBigInteger() % N
+        val e: BigInteger = hashTagged(
+            r.toByteArray() + pubkey.toByteArray() + message,
+            "BIP0340/challenge"
+        ).ByteArrayToBigInteger() % N
 
         val R: PointField = EllipticCurve.addPoint(
             multiplyPoint(s),
@@ -195,39 +201,6 @@ object Schnorr {
 
 
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
-
-
-}
-
-
-fun main() {
-
-    var num = 1
-    while (true) {
-        //val privateKey = BigInteger(256, SecureRandom())
-
-        val privateKey = BigInteger("83815085818061553551680724484383113567819967948708730975173007970516951616417")
-
-        val message: ByteArray = "I am a fish".SHA256()
-
-        val xValue: ByteArray = privateKey.toPoint().x.toByteArray() // PublicKey x value
-
-        val signature = Schnorr.sign(privateKey, message.ByteArrayToBigInteger())
-
-        val verify: Boolean = Schnorr.verify(message, xValue, signature)
-
-        num++
-        if (!verify) {
-            println("\nCount: $num")
-            println("Private Key hex ${privateKey.toByteArray().size} bytes: ${privateKey.DeciToHex()}")
-            println("signature: \n s : ${signature.first.DeciToHex()} ${signature.first.toByteArray().size} Bytes \n r : ${signature.second.DeciToHex()} ${signature.second.toByteArray().size} Bytes")
-            println("verify: $verify")
-            break
-        } else {
-            println("pass $verify : $num")
-        }
-
-    }
 
 
 }

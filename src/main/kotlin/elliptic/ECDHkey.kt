@@ -1,7 +1,7 @@
 package elliptic
 
 
-import elliptic.ECPublicKey.keyRecovery
+import elliptic.ECPublicKey.pointRecovery
 import elliptic.EllipticCurve.multiplyPoint
 import java.math.BigInteger
 
@@ -26,7 +26,7 @@ object ECDHkey {
     ): String {
 
         // แปลง public key ให้อยู่ในรูปของ PointField นั้นก็คือ (x, y) ซึ่งเป็นพิกัดบนเส้นโค้งวงรี
-        val point: PointField = publicKey.keyRecovery()
+        val point: PointField = publicKey.pointRecovery()
             ?: throw IllegalArgumentException("Invalid or unsupported public key format")
 
         // คำนวณค่าจุดบนเส้นโค้งวงรีจาก private key โดยใช้เมธอด `generatePoint` ที่เขียนไว้ใน `ECPublicKey.kt`

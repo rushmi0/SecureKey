@@ -51,7 +51,7 @@ object Schnorr {
 
         return PointField(
             pubkey,
-            if (y.mod(BigInteger.TWO) == BigInteger.ZERO) y else P - y
+            if (y.hasEvenY()) y else P - y
         )
     }
 
@@ -296,8 +296,7 @@ fun main() {
             println("verify: $verify")
             break
         } else {
-            println("Count: $num")
-            println(verify)
+            println("Count $num : verify $verify")
         }
 
     }

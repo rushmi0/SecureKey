@@ -6,6 +6,7 @@ import elliptic.EllipticCurve.P
 import elliptic.EllipticCurve.A
 import elliptic.EllipticCurve.B
 import elliptic.EllipticCurve.multiplyPoint
+import elliptic.Signature.Schnorr.hasEvenY
 
 import util.ShiftTo.ByteArrayToBigInteger
 import util.ShiftTo.ByteArrayToHex
@@ -203,11 +204,10 @@ object ECPublicKey {
 
         val y = c.modPow((P + 1.toBigInteger()) / 4.toBigInteger(), P)
 
-        return if (y.modPow(2.toBigInteger(), P) == c) {
-            PointField(this, y)
-        } else {
-            PointField(this, P - y)
-        }
+        return PointField(
+            this,
+            if (y.hasEvenY()) y else P - y
+        )
     }
 
 
@@ -228,25 +228,7 @@ object ECPublicKey {
         return PointField(xCoord, computedY)
     }
 
-    /*
-    private fun publicKeyGroup(xGroupOnly: String): PointField? {
-        val xOnlyByteArray: ByteArray = xGroupOnly.HexToByteArray()
-        val xCoord: BigInteger = xOnlyByteArray.copyOfRange(1, xOnlyByteArray.size).ByteArrayToBigInteger()
-        val dataSize = xOnlyByteArray.size
-        return when (dataSize) {
-            33 -> {
 
-                xCoord.evaluatePoint()
-            }
-            32 -> {
-                BigInteger(xGroupOnly, 16).evaluatePoint()
-            }
-            else -> {
-                null
-            }
-        }
-    }
-     */
 
 
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
@@ -261,8 +243,7 @@ object ECPublicKey {
 
         return when (this.HexToByteArray().size) {
             33 -> {
-                val receive: ByteArray = this.HexToByteArray().copyOfRange(1, this.HexToByteArray().size)
-                BigInteger(receive.ByteArrayToHex(), 16).evaluatePoint()
+                publicKeyGroup(this)
             }
 
             32 -> {

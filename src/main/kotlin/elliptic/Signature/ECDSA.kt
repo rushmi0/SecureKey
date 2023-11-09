@@ -7,8 +7,6 @@ import elliptic.EllipticCurve.modinv
 import elliptic.EllipticCurve.multiplyPoint
 import elliptic.PointField
 import elliptic.Secp256K1
-import elliptic.example.signature.TestECDSA
-import util.ShiftTo.ByteArrayToBigInteger
 import java.math.BigInteger
 import java.security.SecureRandom
 
@@ -27,8 +25,23 @@ object ECDSA {
     private val curveDomain: Secp256K1.CurveParams = Secp256K1.getCurveParams()
     private val N: BigInteger = curveDomain.N
 
+
+    fun sign() {
+
+    }
+
+    fun verify() {
+
+    }
+
+
+
+    // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
+
+
     // * สร้างลายเซ็น โดยรับค่า private key และ message ที่ต้องการลงลายเซ็น และคืนค่าเป็นคู่ของ BigInteger (r, s)
-    fun sign(
+
+    fun signECDSA(
         privateKey: BigInteger,
         message: BigInteger
     ): Pair<BigInteger, BigInteger> {
@@ -54,23 +67,26 @@ object ECDSA {
         return Pair(r, s)
     }
 
-    fun verify(
+    fun verifyECDSA(
         publicKeyPoint: String,
         message: BigInteger,
         signature: Pair<BigInteger, BigInteger>
     ): Boolean {
         val (r, s) = signature
 
-        val w = modinv(s, N)
-        val u1 = (message * w) % N
-        val u2 = (r * w) % N
+        val w: BigInteger = modinv(s, N)
+        val u1: BigInteger = (message * w) % N
+        val u2: BigInteger = (r * w) % N
 
-        val point1 = multiplyPoint(u1)
-        val point2 = multiplyPoint(u2, publicKeyPoint.pointRecovery())
+        val point1: PointField = multiplyPoint(u1)
+        val point2: PointField = multiplyPoint(
+            u2,
+            publicKeyPoint.pointRecovery()
+        )
 
-        val point = addPoint(point1, point2)
+        val point: PointField = addPoint(point1, point2)
 
-        val x = point.x % N
+        val x: BigInteger = point.x % N
 
         return x == r
     }

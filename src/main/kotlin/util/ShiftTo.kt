@@ -161,15 +161,26 @@ object ShiftTo {
     }
 
 
-    //fun String.HexToByteArray(): ByteArray = ByteArray(this.length / 2) { this.substring(it * 2, it * 2 + 2).toInt(16).toByte() }
-    fun String.HexToByteArray(): ByteArray {
+    fun String.HexToByteArray(): ByteArray = ByteArray(this.length / 2) { this.substring(it * 2, it * 2 + 2).toInt(16).toByte() }
+    /*fun String.HexToByteArray(): ByteArray {
         val hex = this.replace("", "")
         val byteArray = ByteArray(hex.length / 2)
         for (i in byteArray.indices) {
             byteArray[i] = hex.substring(2 * i, 2 * i + 2).toInt(16).toByte()
         }
         return byteArray
+    }*/
+
+    /*
+    fun String.HexToByteArray(): ByteArray {
+        val len = this.length
+        val buf = ByteArray(len / 2)
+        for (i in 0 until len step 2) {
+            buf[i / 2] = ((this[i].digitToInt(16) shl 4) + this[i + 1].digitToInt(16)).toByte()
+        }
+        return buf
     }
+     */
 
     fun String.littleEndianToDeci(): Long {
         var result: Long = 0

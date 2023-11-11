@@ -56,6 +56,31 @@ object Schnorr {
         )
     }
 
+    fun lift_x(x: BigInteger): PointField? {
+        // Fail if x ≥ p.
+        if (x >= P) {
+            return null
+        }
+
+
+        val c = x.modPow(BigInteger.valueOf(3), P).add(BigInteger.valueOf(7)).mod(P)
+        val yCandidate = c.modPow(P.add(BigInteger.ONE).divide(BigInteger.valueOf(4)), P)
+
+        // Fail if c ≠ y^2 mod P
+        if (c != yCandidate.modPow(BigInteger.valueOf(2), P)) {
+            return null
+        }
+
+        // Calculate y(P)
+        val y = if (yCandidate.mod(BigInteger.valueOf(2)) == BigInteger.ZERO) {
+            yCandidate
+        } else {
+            P.subtract(yCandidate)
+        }
+
+        return PointField(x, y)
+    }
+
 
     private fun hashTagged(tag: String, data: ByteArray): ByteArray {
         val tagBytes: ByteArray = tag.SHA256()
@@ -189,6 +214,9 @@ object Schnorr {
         pubkey: ByteArray,
         signature: String
     ): Boolean {
+        require(pubkey.size == 32) { "The public key must be a 32-byte array." }
+        require(signature.HexToByteArray().size == 64) { "The signature must be a 64-byte array." }
+
         val record = signature.length
 
         // แบ่งครึ่ง String
@@ -228,10 +256,10 @@ object Schnorr {
             return false
         }
 
-        val P: PointField = evaluatePoint(pubkey.ByteArrayToBigInteger())
+        val P: PointField? = lift_x(pubkey.ByteArrayToBigInteger())
 
         //val buf: ByteArray = r.DeciToHex().HexToByteArray() + pubkey + message
-        val buf: ByteArray = r.toByteArray() + P.x.toString(16).HexToByteArray() + message
+        val buf: ByteArray = r.toByteArray() + P!!.x.toString(16).HexToByteArray() + message
 
         val e: BigInteger = hashTagged("BIP0340/challenge", buf).ByteArrayToBigInteger() % N
 
@@ -271,6 +299,8 @@ fun main() {
     val message: ByteArray = "I am a fish".SHA256()
 
     val xValue: ByteArray = privateKey.toPoint().x.DeciToHex().HexToByteArray() // PublicKey x value
+    val recover = Schnorr.lift_x(privateKey)
+    println("recover: $recover")
     val signature = Schnorr.sign(privateKey, message.ByteArrayToBigInteger())
     //val signature = "304502205c7a11d1f55ac84ed6085830edb781daa098a8ebe08e06c5ce636a7e6e36b14e02210085925ce97dc35463a48122ce22ce3bbb445c54df7586c2354a05593be0db73c1"
     val verify: Boolean = Schnorr.verify(message, xValue, signature)
@@ -282,10 +312,10 @@ fun main() {
     println("Public Key X: ${privateKey.toPoint().x.toString(16)}")
 
     println("Signature size ${signature.HexToByteArray().size} bytes: $signature")
-    println("verify: $verify")
+    println("my verify: $verify")
 
     val libver = libVerify(message, xValue, signature.HexToByteArray())
-    println("lib verify: $libver")
+    println("secp256k1-kmp-jni verify: $libver")
 
 
 //    var num = 1

@@ -164,19 +164,25 @@ def schnorr_verify(msg: bytes, pubkey: bytes, sig: bytes) -> bool:
 
 
 def run():
-    privet_key = "287d1c14e0727d8b543ee8a119e63f9d74b204420f58cc73a655f02bdb916ed1"
+    privet_key = binascii.unhexlify("25fc758699f0d46d177764f79ddd8d76256f0204299a3c5da88f5d12e61ba9c7")
+    d0 = int_from_bytes(privet_key)
     message = "4c7dbc46486ad9569442d69b558db99a2612c4f003e6631b593942f531e67fd4"
     signature = "bc4f7d12fad2706a05ff5d91ac6cc20dfbe89bb1cc5838e37d9a86e089f8b6f9ce8f6b951af0b1624b5ade0cc39d205873ecce1d30dedb902f3504c3c8241825"
 
-    pubkey = pubkey_gen(binascii.unhexlify(privet_key))
+    pubkey = pubkey_gen(privet_key)
     msg = binascii.unhexlify(message)
     sig = binascii.unhexlify(signature)
 
     print(pubkey.hex())
-    verify = schnorr_verify(msg, pubkey, sig)
-    print("my sig verify", verify)
+    # verify = schnorr_verify(msg, pubkey, sig)
+    # print("my sig verify", verify)
 
-    sign = schnorr_sign(msg, binascii.unhexlify(privet_key), binascii.unhexlify(privet_key))
+    puk_point = point_mul(G, d0)
+    print(puk_point)
+    p = bytes_from_point(puk_point)
+    print(p.hex())
+
+    sign = schnorr_sign(msg, privet_key, binascii.unhexlify("2455993b2c90f1c459bae2c7b09704ab0f10406f84e1acd35610e8867b430bd8"))
     verify1 = schnorr_verify(msg, pubkey, sign)
     print("lib sig veryfy", verify1)
 
@@ -184,5 +190,4 @@ def run():
 
 
 if __name__ == '__main__':
-    print('Running test vectors...')
     run()

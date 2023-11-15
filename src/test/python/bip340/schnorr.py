@@ -1,3 +1,4 @@
+import os
 from typing import Tuple, Optional, Any
 import hashlib
 import binascii
@@ -123,7 +124,7 @@ def schnorr_sign(msg: bytes, seckey: bytes, aux_rand: bytes) -> bytes:
     t = xor_bytes(bytes_from_int(d), tagged_hash(
         "BIP0340/aux",
         aux_rand
-    ) )
+    ))
 
     k0 = int_from_bytes(tagged_hash(
         "BIP0340/nonce",
@@ -164,29 +165,39 @@ def schnorr_verify(msg: bytes, pubkey: bytes, sig: bytes) -> bool:
 
 
 def run():
-    privet_key = binascii.unhexlify("25fc758699f0d46d177764f79ddd8d76256f0204299a3c5da88f5d12e61ba9c7")
-    d0 = int_from_bytes(privet_key)
-    message = "4c7dbc46486ad9569442d69b558db99a2612c4f003e6631b593942f531e67fd4"
-    signature = "bc4f7d12fad2706a05ff5d91ac6cc20dfbe89bb1cc5838e37d9a86e089f8b6f9ce8f6b951af0b1624b5ade0cc39d205873ecce1d30dedb902f3504c3c8241825"
-
+    random = os.urandom(32)
+    # print(len(random))
+    # privet_key = binascii.unhexlify("25fc758699f0d46d177764f79ddd8d76256f0204299a3c5da88f5d12e61ba9c7")
+    privet_key = random
     pubkey = pubkey_gen(privet_key)
+    d0 = int_from_bytes(privet_key)
+
+
+    message = "4c7dbc46486ad9569442d69b558db99a2612c4f003e6631b593942f531e67fd4"
+
+
+    sk = binascii.unhexlify("93c9d847baaf9ee2a4b65674f2cb3bafb36cc6aa6d9afae863117c1a745b1861")
+    pk = pubkey_gen(sk)
+    print("Public key: " + pk.hex())
+    print(len(pk))
+    signature = "3878c9af545e6f28b71646a67e658ee7fbec1c531cd5981f8b6fdd8b8bd0ee3779d70190dee926a0f9b5ba0b42d244d6bf42643830209b3381a71c24b1fbc762"
+
+
     msg = binascii.unhexlify(message)
     sig = binascii.unhexlify(signature)
 
-    print(pubkey.hex())
-    # verify = schnorr_verify(msg, pubkey, sig)
-    # print("my sig verify", verify)
+    verify = schnorr_verify(msg, pk, sig)
+    print("my sig verify", verify)
 
     puk_point = point_mul(G, d0)
-    print(puk_point)
+    # print(puk_point)
     p = bytes_from_point(puk_point)
-    print(p.hex())
+    # print(p.hex())
 
-    sign = schnorr_sign(msg, privet_key, binascii.unhexlify("2455993b2c90f1c459bae2c7b09704ab0f10406f84e1acd35610e8867b430bd8"))
-    verify1 = schnorr_verify(msg, pubkey, sign)
-    print("lib sig veryfy", verify1)
-
-
+    sign = schnorr_sign(msg, privet_key,
+                        binascii.unhexlify("2455993b2c90f1c459bae2c7b09704ab0f10406f84e1acd35610e8867b430bd8"))
+    #verify1 = schnorr_verify(msg, pubkey, sign)
+    #print("Sig veryfy", verify1)
 
 
 if __name__ == '__main__':

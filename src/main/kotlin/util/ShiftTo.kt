@@ -162,7 +162,9 @@ object ShiftTo {
 
 
     fun String.HexToByteArray(): ByteArray = ByteArray(this.length / 2) { this.substring(it * 2, it * 2 + 2).toInt(16).toByte() }
-    /*fun String.HexToByteArray(): ByteArray {
+
+    /*
+    fun String.HexToByteArray(): ByteArray {
         val hex = this.replace("", "")
         val byteArray = ByteArray(hex.length / 2)
         for (i in byteArray.indices) {

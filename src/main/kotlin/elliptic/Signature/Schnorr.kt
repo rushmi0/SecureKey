@@ -43,18 +43,7 @@ object Schnorr {
      *  Fail if c ≠ y2 mod p.
      * Return the unique point P such that x(P) = x and y(P) = y if y mod 2 = 0 or y(P) = p-y otherwise.
      * */
-    private fun evaluatePoint(pubkey: BigInteger): PointField {
-        require(pubkey < P) { "The public key must be less than the field size." }
 
-        val c = (pubkey.pow(3) + B) % P
-
-        val y = c.modPow((P + 1.toBigInteger()) / 4.toBigInteger(), P)
-
-        return PointField(
-            pubkey,
-            if (y.hasEvenY()) y else P - y
-        )
-    }
 
     fun liftX(x: BigInteger): PointField? {
         // Fail if x ≥ p.
@@ -62,8 +51,9 @@ object Schnorr {
             return null
         }
 
-        val c = x.modPow(BigInteger.valueOf(3), P).add(BigInteger.valueOf(7)).mod(P)
-        val yCandidate = c.modPow(P.add(BigInteger.ONE).divide(BigInteger.valueOf(4)), P)
+        val c = (x.pow(3) + B) % P
+
+        val yCandidate = c.modPow((P + 1.toBigInteger()) / 4.toBigInteger(), P)
 
         // Fail if c ≠ y^2 mod P
         if (c != yCandidate.modPow(BigInteger.valueOf(2), P)) {
@@ -130,8 +120,6 @@ object Schnorr {
 
         val aux = auxRand ?: generateAuxRand()
 
-        //val aux =  BigInteger("963a3e7f243ba219ba286817d0c2dc03bf1b104f34b34caba72b6542eefdf334", 16).DeciToHex().HexToByteArray()
-
         val P: PointField = multiplyPoint(privateKey)
 
         val d: BigInteger = if (P.y.hasEvenY()) {
@@ -169,10 +157,6 @@ object Schnorr {
         val r: BigInteger = R.x
         val s: BigInteger = (kPrime + (e * d)) % N
 
-        // Verify if r and s have correct sizes
-//        if (r.DeciToHex().HexToByteArray().size != 32 || s.DeciToHex().HexToByteArray().size != 32) {
-//            return signWithRetry(privateKey, message)//throw RuntimeException("Unexpected signature sizes.")
-//        }
 
         val verify: Boolean = verifySchnorr(
             message.DeciToHex().HexToByteArray(),
@@ -247,7 +231,6 @@ object Schnorr {
         }
 
         val P: PointField? = liftX(pubkey.ByteArrayToBigInteger())
-        val p = evaluatePoint(pubkey.ByteArrayToBigInteger())
 
         val buf: ByteArray = r.DeciToHex().HexToByteArray() + pubkey + message
         //val buf: ByteArray = r.toByteArray() + P!!.x.toString(16).HexToByteArray() + message

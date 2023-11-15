@@ -67,7 +67,7 @@ class CurveDomain(name: String) {
     }
 }
 
-
+/*
 fun main() {
 
     val curve = CurveDomain("secp256k1").params
@@ -78,3 +78,4 @@ fun main() {
     println(curve.N)
     println(curve.G)
 }
+*/

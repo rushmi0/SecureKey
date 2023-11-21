@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JetClientState">
+    <option name="draftsState">
+      <draftsState>
+        <option name="requests">
+          <list>
+            <requestState>
+              <option name="id" value="f8bbdd9c-44df-4c27-aa7d-8df1f839ddd7" />
+              <option name="method" value="GET" />
+              <option name="name" value="Draft" />
+              <option name="url" value="wss://relay.example.com" />
+            </requestState>
+          </list>
+        </option>
+      </draftsState>
+    </option>
+    <option name="id" value="ad89679a-5dab-4982-acd3-769bd08fc943" />
+  </component>
+</project>

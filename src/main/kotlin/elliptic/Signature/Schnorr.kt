@@ -7,7 +7,6 @@ import elliptic.EllipticCurve.multiplyPoint
 import elliptic.PointField
 import elliptic.Secp256K1
 import elliptic.Signature.Schnorr.generateAuxRand
-import fr.acinq.secp256k1.Secp256k1
 import util.Hashing.SHA256
 import util.ShiftTo.ByteArrayToBigInteger
 import util.ShiftTo.ByteArrayToHex
@@ -27,13 +26,14 @@ object Schnorr {
 
 
     // * Parameters secp256k1
-    private val curveDomain: Secp256K1.CurveParams = Secp256K1.getCurveParams()
-    private val N: BigInteger = curveDomain.N
-    private val P: BigInteger = curveDomain.P
-    private val B: BigInteger = curveDomain.B
+    private val B = BigInteger.valueOf(7)
+    private val P = BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", 16)
+    private val N = BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", 16)
 
 
     fun BigInteger.hasEvenY(): Boolean = this.mod(BigInteger.TWO) == BigInteger.ZERO
+
+    fun isInfinity(P: Point?): Boolean = P == null
 
     /**
      * lift_x(x) is equivalent to the following pseudocode:
@@ -64,7 +64,7 @@ object Schnorr {
         val y = if (yCandidate.hasEvenY()) {
             yCandidate
         } else {
-            P.subtract(yCandidate)
+            P - yCandidate
         }
 
         return PointField(x, y)
@@ -74,12 +74,32 @@ object Schnorr {
     private fun hashTagged(tag: String, data: ByteArray): ByteArray {
         val tagBytes: ByteArray = tag.SHA256()
 
-        val com = tagBytes.copyOfRange(0, tagBytes.size) + tagBytes.copyOfRange(0, tagBytes.size) + data
-        return com.SHA256()
+        val buf = tagBytes.copyOfRange(0, tagBytes.size) + tagBytes.copyOfRange(0, tagBytes.size) + data
+        return buf.SHA256()
     }
 
 
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
+
+
+    fun generateAuxRand(): ByteArray {
+        while (true) {
+            val auxRand = BigInteger(256, SecureRandom()).toByteArray()
+            if (auxRand.size == 32) {
+                return auxRand
+            }
+        }
+    }
+
+
+
+    private fun signWithRetry(
+        privateKey: BigInteger,
+        message: BigInteger,
+    ): Pair<BigInteger, BigInteger> {
+        return signSchnorr(privateKey, message)
+    }
+
 
 
     /**
@@ -100,27 +120,16 @@ object Schnorr {
      * Return the signature sig.
      * */
 
-
-    fun generateAuxRand(): ByteArray {
-        while (true) {
-            val auxRand = BigInteger(256, SecureRandom()).toByteArray()
-            if (auxRand.size == 32) {
-                return auxRand
-            }
-        }
-    }
-
-
     private fun signSchnorr(
         privateKey: BigInteger,
         message: BigInteger,
         auxRand: ByteArray? = null
     ): Pair<BigInteger, BigInteger> {
-        require(privateKey < N) { "The private key must be less than the curve order." }
 
         val aux = auxRand ?: generateAuxRand()
 
         val P: PointField = multiplyPoint(privateKey)
+        require(P != null) {"Assertion failed: P must not be null."}
 
         val d: BigInteger = if (P.y.hasEvenY()) {
             privateKey
@@ -165,8 +174,7 @@ object Schnorr {
         )
 
         return if (!verify || (r.DeciToHex().HexToByteArray().size != 32 || s.DeciToHex().HexToByteArray().size != 32)) {
-            // Retry signature generation if verification fails
-            signSchnorr(privateKey, message)
+            signWithRetry(privateKey, message)
         } else {
             Pair(r, s)
         }
@@ -223,6 +231,16 @@ object Schnorr {
         message: BigInteger,
         auxRand: ByteArray? = null
     ): String {
+        require(privateKey < N) { "The private key must be less than the curve order." }
+        if (!(1.toBigInteger() <= privateKey && privateKey <= N - 1.toBigInteger())) {
+            throw IllegalArgumentException("The secret key must be an integer in the range 1..n-1.")
+        }
+
+        if (auxRand?.size != 32) {
+            throw IllegalArgumentException("aux_rand must be 32 bytes instead of ${auxRand?.size}")
+        }
+
+
         val (r: BigInteger, s: BigInteger) = signSchnorr(privateKey, message, auxRand)
         return r.DeciToHex() + s.DeciToHex()
     }
@@ -252,64 +270,68 @@ fun main() {
 
 
     //val privateKey = BigInteger("25fc758699f0d46d177764f79ddd8d76256f0204299a3c5da88f5d12e61ba9c7", 16)
-
     //val privateKey = BigInteger("1457876265edee2739302ce0996cfc387e00026cc5a87c9f23d571039bc5b904", 16)
     //val privateKey = BigInteger("5328cb703097a064ea27873eb6d1b97232ab096b6e21f6f7afa3684a2e249431", 16)
-    val privateKey = generateAuxRand().ByteArrayToBigInteger()
     //val privateKey = BigInteger("93c9d847baaf9ee2a4b65674f2cb3bafb36cc6aa6d9afae863117c1a745b1861", 16)
-    println("Private Key: ${privateKey.DeciToHex()}")
 
-    val message: ByteArray = "I am a fish".SHA256()
-
-    val xValue: ByteArray = privateKey.toPoint().x.DeciToHex().HexToByteArray() // PublicKey x value
-
-    val ran = "77c179f9076085a8a317c1fcd6f67327a35c1add0efe303a53883533fcb88f80".HexToByteArray()
-    //val ran = generateAuxRand()
-
-    println("Random: ${ran.size} ${ran.ByteArrayToHex()}")
-    val signature =  Schnorr.sign(privateKey, message.ByteArrayToBigInteger(), ran)
-    //val signature = "304502205c7a11d1f55ac84ed6085830edb781daa098a8ebe08e06c5ce636a7e6e36b14e02210085925ce97dc35463a48122ce22ce3bbb445c54df7586c2354a05593be0db73c1"
-    val verify: Boolean = Schnorr.verify(message, xValue, signature)
-
-    println(multiplyPoint(privateKey))
-    println(message.ByteArrayToHex())
-
-    println("Private Key: ${privateKey.DeciToHex()} size ${privateKey.DeciToHex().HexToByteArray().size} bytes")
-    println("Public Key X: ${privateKey.toPoint().x.toString(16)}")
-
-    println("Signature size ${signature.HexToByteArray().size} bytes: $signature")
-    println("Verify Signature: $verify")
-
-
-//    val libver = libVerify(message, xValue, signature.HexToByteArray())
-//    println("secp256k1-kmp-jni verify: $libver")
-
-
-//    var num = 1
-//    while (true) {
-//        val privateKey = generateAuxRand().ByteArrayToBigInteger()
+//    val privateKey = generateAuxRand().ByteArrayToBigInteger()
+//    println("Private Key: ${privateKey.DeciToHex()}")
 //
-//        val message: ByteArray = "I am a fish".SHA256()
+//    val message: ByteArray = "I am a fish".SHA256()
 //
-//        val xValue: ByteArray = privateKey.toPoint().x.DeciToHex().HexToByteArray() // PublicKey x value
-//        val signature = Schnorr.sign(privateKey, message.ByteArrayToBigInteger())
-//        val verify: Boolean = Schnorr.verify(message, xValue, signature)
+//    val xValue: ByteArray = privateKey.toPoint().x.DeciToHex().HexToByteArray() // PublicKey x value
 //
-//        num++
-//        if (!verify) {
-//            println("\nCount: $num")
-//            println(multiplyPoint(privateKey))
-//            println("Message: ${message.ByteArrayToHex()}")
+//    val ran = "77c179f9076085a8a317c1fcd6f67327a35c1add0efe303a53883533fcb88f80".HexToByteArray()
+//    //val ran = generateAuxRand()
 //
-//            println("Private Key: ${privateKey.DeciToHex()} size ${privateKey.DeciToHex().HexToByteArray().size} bytes")
-//            println("Signature size ${signature.HexToByteArray().size} bytes: $signature")
-//            println("verify: $verify")
-//            break
-//        } else {
-//            println("Count $num : verify $verify")
-//        }
+//    println("Random: ${ran.size} ${ran.ByteArrayToHex()}")
+//    val signature =  Schnorr.sign(privateKey, message.ByteArrayToBigInteger(), ran)
+//    val verify: Boolean = Schnorr.verify(message, xValue, signature)
 //
-//    }
+//    println(multiplyPoint(privateKey))
+//    println(message.ByteArrayToHex())
+//
+//    println("Private Key: ${privateKey.DeciToHex()} size ${privateKey.DeciToHex().HexToByteArray().size} bytes")
+//    println("Public Key X: ${privateKey.toPoint().x.toString(16)}")
+//
+//    println("Signature size ${signature.HexToByteArray().size} bytes: $signature")
+//    println("Verify Signature: $verify")
+
+
+    var num = 0
+    while (true) {
+
+        val privateKey = generateAuxRand().ByteArrayToBigInteger()
+        println("Private Key: ${privateKey.DeciToHex()}")
+
+        val message: ByteArray = "I am a fish".SHA256()
+
+        val xValue: ByteArray = privateKey.toPoint().x.DeciToHex().HexToByteArray() // PublicKey x value
+
+        val ran = "77c179f9076085a8a317c1fcd6f67327a35c1add0efe303a53883533fcb88f80".HexToByteArray()
+        //val ran = generateAuxRand()
+
+        println("Random: ${ran.size} ${ran.ByteArrayToHex()}")
+        val signature =  Schnorr.sign(privateKey, message.ByteArrayToBigInteger(), ran)
+        val verify: Boolean = Schnorr.verify(message, xValue, signature)
+
+        num++
+        if (!verify) {
+            println("\nCount: $num")
+            println(multiplyPoint(privateKey))
+            println(message.ByteArrayToHex())
+
+            println("Private Key: ${privateKey.DeciToHex()} size ${privateKey.DeciToHex().HexToByteArray().size} bytes")
+            println("Public Key X: ${privateKey.toPoint().x.toString(16)}")
+
+            println("Signature size ${signature.HexToByteArray().size} bytes: $signature")
+            println("Verify Signature: $verify")
+            break
+        } else {
+            println("Count $num : verify $verify")
+        }
+
+    }
 
 
 }

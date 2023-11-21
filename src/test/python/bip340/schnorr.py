@@ -118,8 +118,10 @@ def schnorr_sign(msg: bytes, seckey: bytes, aux_rand: bytes) -> bytes:
         raise ValueError('The secret key must be an integer in the range 1..n-1.')
     if len(aux_rand) != 32:
         raise ValueError('aux_rand must be 32 bytes instead of %i.' % len(aux_rand))
+
     P = point_mul(G, d0)
     assert P is not None
+
     d = d0 if has_even_y(P) else n - d0
     t = xor_bytes(bytes_from_int(d), tagged_hash(
         "BIP0340/aux",

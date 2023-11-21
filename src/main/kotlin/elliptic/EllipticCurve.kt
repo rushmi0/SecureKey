@@ -15,7 +15,7 @@ import java.math.BigInteger
 object EllipticCurve {
 
     // * กำหนดค่าพื้นฐานของเส้นโค้งวงรี โดยใส่ชื่อเส้นโค้งวงรีที่ต้องการใช้งาน
-    private val curve = CurveDomain("secp256k1").params
+    private val curve = Secp256K1.getCurveParams()
 
     // * ค่า A, B, P, G ที่ใช้ในการคำนวณ
     val A: BigInteger = curve.A

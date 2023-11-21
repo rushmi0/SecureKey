@@ -6,7 +6,6 @@ import java.util.*
 
 object ShiftTo {
 
-    private val HEX_ARRAY: CharArray = "0123456789abcdef".toCharArray()
     private val hexDigits: String = "0123456789abcdef"
 
 

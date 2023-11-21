@@ -1,7 +1,6 @@
 package elliptic
 
 
-import elliptic.ECPublicKey.verifyPoint
 import elliptic.EllipticCurve.P
 import elliptic.EllipticCurve.A
 import elliptic.EllipticCurve.B

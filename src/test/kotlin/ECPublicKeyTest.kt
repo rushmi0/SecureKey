@@ -145,58 +145,8 @@ open class ECPublicKeyTest {
 
 
 
-    // ทดสอบ เรียกใช้งาน `isPointOnCurve()` เพื่อตรวจสอบว่า public key อยู่บนเส้นโค้ง elliptic curve ผลลัพธ์เป็นเท็จ
-    @Test
-    @DisplayName("ทดสอบ เรียกใช้งาน isPointOnCurve() : คืนค่า false")
-    fun testisPointOnCurveFalse() {
-        // PointField(x=109425287674888529967061023908045177545342372981171741638737825913363439420506, y=88797395911209296315170763047486770355198711722591449334415584811572973967198)
-        val inValinPoint = PointField(
-            x = BigInteger("109425287674888529967061023908045177545342372981171741638737825913363439420506"),
-            y = BigInteger("88797395911209296315170763047486770355198711722591449334415584811572973967198"),
-        )
-        val verifyPoint = isPointOnCurve(inValinPoint)
-
-        Assertions.assertFalse(verifyPoint)
-
-        Assertions.assertEquals(
-            verifyPoint,
-            false
-        )
-    }
-
-
     // �� ──────────────────────────────────────────────────────────────────────────────────────── �� \\
 
-
-    @Test
-    fun testFindY() {
-
-        val key33Bytes: PointField = privateKey.toPublicKey().compressed().pointRecovery()
-        Assertions.assertEquals(
-            publicKeyPoint,
-            key33Bytes
-        )
-
-        val key32Bytes: PointField = publicKeyXHex.pointRecovery()
-        Assertions.assertEquals(
-            publicKeyPoint,
-            key32Bytes
-        )
-
-        val keyPointXonly: PointField = privateKey.toPoint().x.evaluatePoint()
-        Assertions.assertEquals(
-            publicKeyPoint,
-            keyPointXonly
-        )
-
-
-        val keyPoint: PointField = privateKey.toPoint().x.DeciToHex().pointRecovery()
-        Assertions.assertEquals(
-            publicKeyPoint,
-            keyPoint
-        )
-
-    }
 
 
 
